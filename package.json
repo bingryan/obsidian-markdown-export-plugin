@@ -1,15 +1,19 @@
 {
-	"name": "obsidian-sample-plugin",
+	"name": "obsidian-markdown-export",
 	"version": "1.0.0",
-	"description": "This is a sample plugin for Obsidian (https://obsidian.md)",
+	"description": "This plugin allows to markdown to a folder.",
 	"main": "main.js",
 	"scripts": {
 		"dev": "node esbuild.config.mjs",
 		"build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
 		"version": "node version-bump.mjs && git add manifest.json versions.json"
 	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/bingryan/obsidian-markdown-export-plugin.git"
+	  },
 	"keywords": [],
-	"author": "",
+	"author": "bingryan",
 	"license": "MIT",
 	"devDependencies": {
 		"@types/node": "^16.11.6",
