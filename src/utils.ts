@@ -1,7 +1,8 @@
 import * as path from "path";
-import { IMAGE_URL_REGEXP } from "./config";
-import MarkdownExportPlugin from "./main";
 import md5 from "md5";
+
+import { IMAGE_URL_REGEXP, GMT_IMAGE_FORMAT } from "./config";
+import MarkdownExportPlugin from "./main";
 
 export async function getImageLinks(markdown: string) {
 	const imageLinks = markdown.matchAll(IMAGE_URL_REGEXP);
@@ -70,7 +71,7 @@ export async function tryCopyMarkdown(
 	}
 }
 
-export async function tryReadMarkdown(
+export async function tryCopyMarkdownByRead(
 	plugin: MarkdownExportPlugin,
 	contentPath: string,
 	contentName: string
@@ -80,7 +81,9 @@ export async function tryReadMarkdown(
 			.read(contentPath)
 			.then(async (content) => {
 				const imageLinks = await getImageLinks(content);
+
 				for (const index in imageLinks) {
+					const rawImageLink = imageLinks[index][0];
 					const imageLink = imageLinks[index][1];
 					const imageLinkMd5 = md5(imageLink);
 					const imageExt = path.extname(imageLink);
@@ -89,7 +92,15 @@ export async function tryReadMarkdown(
 						plugin.settings.attachment,
 						imageLinkMd5.concat(imageExt)
 					);
-					content = content.replace(imageLink, hashLink);
+
+					if (plugin.settings.GTM) {
+						content = content.replace(
+							rawImageLink,
+							GMT_IMAGE_FORMAT.format(hashLink)
+						);
+					} else {
+						content = content.replace(imageLink, hashLink);
+					}
 				}
 
 				plugin.app.vault.adapter.write(

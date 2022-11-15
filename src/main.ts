@@ -6,10 +6,10 @@ import {
 	PluginSettingTab,
 	Setting,
 } from "obsidian";
-import { MarkdownExportPluginSettings, DEFAULT_SETTINGS } from "./config";
-
 import * as path from "path";
-import { tryCreateFolder, tryCopyImage, tryReadMarkdown } from "./utils";
+
+import { MarkdownExportPluginSettings, DEFAULT_SETTINGS } from "./config";
+import { tryCreateFolder, tryCopyImage, tryCopyMarkdownByRead } from "./utils";
 
 export default class MarkdownExportPlugin extends Plugin {
 	settings: MarkdownExportPluginSettings;
@@ -37,7 +37,7 @@ export default class MarkdownExportPlugin extends Plugin {
 						);
 
 						// copy markdown file to output directory
-						await tryReadMarkdown(this, file.path, file.name);
+						await tryCopyMarkdownByRead(this, file.path, file.name);
 
 						// copy image to attachment directory
 						await tryCopyImage(this, file.path);
@@ -93,7 +93,6 @@ class MarkdownExportSettingTab extends PluginSettingTab {
 					.setPlaceholder("Enter default output path")
 					.setValue(this.plugin.settings.output)
 					.onChange(async (value) => {
-						console.log("output path: " + value);
 						this.plugin.settings.output = value;
 						await this.plugin.saveSettings();
 					})
@@ -107,8 +106,21 @@ class MarkdownExportSettingTab extends PluginSettingTab {
 					.setPlaceholder("Enter attachment path")
 					.setValue(this.plugin.settings.attachment)
 					.onChange(async (value) => {
-						console.log("attachment path: " + value);
 						this.plugin.settings.output = value;
+						await this.plugin.saveSettings();
+					})
+			);
+
+		new Setting(containerEl)
+			.setName("Use GitHub Flavored Markdown Format")
+			.setDesc(
+				"The format of markdown is more inclined to choose Github Flavored Markdown"
+			)
+			.addToggle((toggle) =>
+				toggle
+					.setValue(this.plugin.settings.GTM)
+					.onChange(async (value: boolean) => {
+						this.plugin.settings.GTM = value;
 						await this.plugin.saveSettings();
 					})
 			);
