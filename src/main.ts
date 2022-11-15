@@ -26,7 +26,7 @@ export default class MarkdownExportPlugin extends Plugin {
 					item.setTitle("Export all to package");
 					item.onClick(async () => {
 						// try create output directory
-						await tryCreateFolder(this, this.settings.output);
+						// await tryCreateFolder(this, this.settings.output);
 						// try create attachment directory
 						await tryCreateFolder(
 							this,
