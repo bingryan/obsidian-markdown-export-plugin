@@ -10,8 +10,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-	  - name: Prepare repository
-	    run: git fetch --unshallow --tags
+      - name: Prepare repository
+        run: git fetch --unshallow --tags
 
       - name: Install modules
         run: yarn
