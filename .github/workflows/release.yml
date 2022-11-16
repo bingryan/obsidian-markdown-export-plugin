@@ -1,11 +1,12 @@
 name: Release
 on:
-  push:
-    branches: [master]
   pull_request:
     branches: [master]
+	types:
+	- labeled
 jobs:
   verify:
+	if: github.event.label.name == 'release'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
