@@ -13,7 +13,9 @@
 		"type": "git",
 		"url": "git+https://github.com/bingryan/obsidian-markdown-export-plugin.git"
 	},
-	"keywords": [],
+	"keywords": [
+		"obsidian"
+	],
 	"author": "bingryan",
 	"license": "MIT",
 	"devDependencies": {
