@@ -1,6 +1,6 @@
 {
 	"name": "obsidian-markdown-export",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "This plugin allows to markdown to a folder.",
 	"main": "main.js",
 	"scripts": {

@@ -5,7 +5,8 @@ on:
   pull_request:
     branches: [master]
 jobs:
-  verify:
+  production-release:
+    if: github.event.label.name == 'release'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
