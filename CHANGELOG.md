@@ -1,3 +1,18 @@
+# 1.0.2 (Tue Nov 22 2022)
+
+#### 🐛 Bug Fix
+
+- Docs/readme [#11](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/11) ([@bingryan](https://github.com/bingryan))
+- docs: update feat [#10](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/10) ([@bingryan](https://github.com/bingryan))
+- feat: add fold export [#9](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/9) ([@bingryan](https://github.com/bingryan))
+- update release.yml workflow [#8](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/8) ([@bingryan](https://github.com/bingryan))
+
+#### Authors: 1
+
+- [@bingryan](https://github.com/bingryan)
+
+---
+
 # 1.0.1 (Wed Nov 16 2022)
 
 #### 🐛 Bug Fix
