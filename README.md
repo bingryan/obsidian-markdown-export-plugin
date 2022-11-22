@@ -2,14 +2,17 @@
 
 This is a markdown export plugin for Obsidian (https://obsidian.md).
 
-It allows you to export markdown to a package (including pictures) with one click, so that you can use it in other applications
+It allows you to export markdown to a package (including pictures) with one click.
+
+--- 
 
 ![screenshot](./export.gif)
 
 ## Features
 
-* Include image attachments
-* Option for use `GitHub Flavored Markdown Format`
+- [x]  Folders and single files are supported
+- [x]  Include image attachments
+- [x]  Option for use `GitHub Flavored Markdown Format`
 
 
 ## How to Install
