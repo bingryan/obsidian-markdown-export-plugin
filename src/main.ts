@@ -8,8 +8,9 @@ import {
 } from "obsidian";
 import * as path from "path";
 
+
 import { MarkdownExportPluginSettings, DEFAULT_SETTINGS } from "./config";
-import { tryCreateFolder, tryCopyImage, tryCopyMarkdownByRead } from "./utils";
+import { tryCreateFolder, tryRun } from "./utils";
 
 export default class MarkdownExportPlugin extends Plugin {
 	settings: MarkdownExportPluginSettings;
@@ -25,8 +26,6 @@ export default class MarkdownExportPlugin extends Plugin {
 				const addMenuItem = (item: MenuItem) => {
 					item.setTitle("Export all to package");
 					item.onClick(async () => {
-						// try create output directory
-						// await tryCreateFolder(this, this.settings.output);
 						// try create attachment directory
 						await tryCreateFolder(
 							this,
@@ -36,11 +35,8 @@ export default class MarkdownExportPlugin extends Plugin {
 							)
 						);
 
-						// copy markdown file to output directory
-						await tryCopyMarkdownByRead(this, file.path, file.name);
-
-						// copy image to attachment directory
-						await tryCopyImage(this, file.path);
+						// run
+						await tryRun(this, file);
 
 						new Notice(
 							`Exporting ${file.path} to ${path.join(
