@@ -6,6 +6,7 @@ on:
     branches: [master]
 jobs:
   production-release:
+    permissions: write-all
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
