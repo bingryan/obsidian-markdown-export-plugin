@@ -1,8 +1,8 @@
 import * as path from "path";
 import md5 from "md5";
-import { TAbstractFile, TFile, TFolder } from "obsidian";
+import {  TAbstractFile, TFile, TFolder,  htmlToMarkdown } from "obsidian";
 
-import { IMAGE_URL_REGEXP, GMT_IMAGE_FORMAT } from "./config";
+import { ATTACHMENT_URL_REGEXP, EMBED_URL_REGEXP, GMT_IMAGE_FORMAT } from "./config";
 import MarkdownExportPlugin from "./main";
 
 type CopyMarkdownOptions = {
@@ -11,8 +11,13 @@ type CopyMarkdownOptions = {
 };
 
 export async function getImageLinks(markdown: string) {
-	const imageLinks = markdown.matchAll(IMAGE_URL_REGEXP);
+	const imageLinks = markdown.matchAll(ATTACHMENT_URL_REGEXP);
 	return Array.from(imageLinks);
+}
+
+export async function getEmbeds(markdown: string) {
+	const embeds = markdown.matchAll(EMBED_URL_REGEXP);
+	return Array.from(embeds);
 }
 
 // get all markdown parameters
@@ -72,7 +77,7 @@ export async function tryRun(
 	// }
 
 	try {
-		let params = allMarkdownParams(file, []);
+		const params = allMarkdownParams(file, []);
 		for (const param of params) {
 			await tryCopyMarkdownByRead(plugin, param);
 		}
@@ -153,6 +158,29 @@ export async function tryCopyMarkdown(
 	}
 }
 
+export async function getEmbedMap(plugin: MarkdownExportPlugin, content: string, path: string) {
+    // key：link url 
+    // value： embed content parse from html document
+	const embedMap = new Map();
+	const embedList = Array.from(document.documentElement.getElementsByClassName('internal-embed'));
+
+
+    Array.from(embedList).forEach((el) => {
+      // markdown-embed-content markdown-embed-page
+      const embedContentHtml = el.getElementsByClassName('markdown-embed-content')[0];
+
+		if (embedContentHtml) {
+			let embedValue = htmlToMarkdown(embedContentHtml.innerHTML);
+			embedValue = '> ' + (embedValue as any).replaceAll('# \n\n', '# ').replaceAll('\n', '\n> ');
+			const embedKey = el.getAttribute("src");
+			embedMap.set(embedKey, embedValue);
+		}
+    });
+
+    return embedMap;
+  }
+
+
 export async function tryCopyMarkdownByRead(
 	plugin: MarkdownExportPlugin,
 	{ file, outputSubPath = "." }: CopyMarkdownOptions
@@ -181,6 +209,16 @@ export async function tryCopyMarkdownByRead(
 					content = content.replace(imageLink, hashLink);
 				}
 			}
+			const cfile = plugin.app.workspace.getActiveFile();
+			if (cfile != undefined){
+				const embedMap = await getEmbedMap(plugin, content, cfile.path);
+				const embeds = await getEmbeds(content);
+				for (const index in embeds) {
+					const url = embeds[index][1];
+					content = content.replace(embeds[index][0], embedMap.get(url));
+				}
+			}
+			
 
 			await tryCopyImage(plugin, file.path);
 			await tryCreateFolder(
