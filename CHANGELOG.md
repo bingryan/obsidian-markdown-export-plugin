@@ -1,3 +1,25 @@
+# 1.0.3 (Tue Dec 20 2022)
+
+#### 🐛 Bug Fix
+
+- update workflow [#23](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/23) ([@bingryan](https://github.com/bingryan))
+- ci: add lint [#22](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/22) ([@bingryan](https://github.com/bingryan))
+- Fix non local attachment copy. [#21](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/21) ([@uroybd](https://github.com/uroybd))
+- Embed markdown in exported files [#13](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/13) ([@uroybd](https://github.com/uroybd))
+- update release workflow [#20](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/20) ([@bingryan](https://github.com/bingryan))
+- update release workflow [#19](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/19) ([@bingryan](https://github.com/bingryan))
+- update release workflow [#18](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/18) ([@bingryan](https://github.com/bingryan))
+- update release workflow [#17](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/17) ([@bingryan](https://github.com/bingryan))
+- update release workflow [#16](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/16) ([@bingryan](https://github.com/bingryan))
+- update ci permissions [#14](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/14) ([@bingryan](https://github.com/bingryan))
+
+#### Authors: 2
+
+- [@bingryan](https://github.com/bingryan)
+- Utsob Roy ([@uroybd](https://github.com/uroybd))
+
+---
+
 # 1.0.2 (Tue Nov 22 2022)
 
 #### 🐛 Bug Fix
