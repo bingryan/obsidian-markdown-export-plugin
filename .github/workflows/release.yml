@@ -1,13 +1,11 @@
 name: Release
+
 on:
   push:
     branches: [master]
-  pull_request:
-    branches: [master]
-permissions: write-all
+
 jobs:
   production-release:
-    if: contains( github.event.pull_request.labels.*.name, 'publish')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
