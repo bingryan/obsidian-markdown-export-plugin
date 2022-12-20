@@ -1,4 +1,5 @@
-export const IMAGE_URL_REGEXP = /!\[\[(.*?)\]\]/g;
+export const ATTACHMENT_URL_REGEXP = /!\[\[((.*?)\.(\w+))\]\]/g;
+export const EMBED_URL_REGEXP = /!\[\[(.*?)\]\]/g;
 
 export const GMT_IMAGE_FORMAT = "![]({0})";
 
