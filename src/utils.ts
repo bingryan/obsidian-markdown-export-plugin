@@ -173,7 +173,7 @@ export async function getEmbedMap(plugin: MarkdownExportPlugin, content: string,
 
 		if (embedContentHtml) {
 			let embedValue = htmlToMarkdown(embedContentHtml.innerHTML);
-			embedValue = '> ' + (embedValue as any).replaceAll('# \n\n', '# ').replaceAll('\n', '\n> ');
+			embedValue = '> ' + (embedValue as string).replaceAll('# \n\n', '# ').replaceAll('\n', '\n> ');
 			const embedKey = el.getAttribute("src");
 			embedMap.set(embedKey, embedValue);
 		}
