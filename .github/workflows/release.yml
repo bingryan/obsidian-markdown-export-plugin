@@ -2,11 +2,10 @@ name: Release
 on:
   push:
     branches: [master]
-  pull_request:
+  pull_request_target:
     branches: [master]
 jobs:
   production-release:
-    permissions: write-all
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
