@@ -3,7 +3,10 @@ on:
   push:
     branches: [master]
   pull_request_target:
-    branches: [master]
+    branches:
+      - master
+    types:
+      - labeled
 jobs:
   production-release:
     runs-on: ubuntu-latest
