@@ -2,16 +2,9 @@ name: Release
 on:
   push:
     branches: [master]
-  pull_request_target:
-    branches:
-      - master
-    types:
-      - labeled
-permissions:
-  contents: read
-  issues: write
-  pull-requests: write
-  packages: write
+  pull_request:
+    branches: [master]
+permissions: write-all
 jobs:
   production-release:
     runs-on: ubuntu-latest
