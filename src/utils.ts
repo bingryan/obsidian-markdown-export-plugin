@@ -115,10 +115,11 @@ export async function tryCopyImage(
 
 					const imageLinkMd5 = md5(imageLink);
 					const imageExt = path.extname(imageLink);
-
+					const ifile = plugin.app.metadataCache.getFirstLinkpathDest(imageLink, contentPath);
+					if (ifile){
 					plugin.app.vault.adapter
 						.copy(
-							path.join(path.dirname(contentPath), imageLink),
+							ifile.path,
 							path.join(
 								plugin.settings.output,
 								plugin.settings.attachment,
@@ -132,6 +133,7 @@ export async function tryCopyImage(
 								throw error;
 							}
 						});
+					}
 				}
 			});
 	} catch (error) {
