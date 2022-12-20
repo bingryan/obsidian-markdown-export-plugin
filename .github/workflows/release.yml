@@ -7,6 +7,7 @@ on:
 permissions: write-all
 jobs:
   production-release:
+    if: github.event.label.name == 'publish'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
