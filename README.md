@@ -13,6 +13,7 @@ It allows you to export markdown to a package (including pictures) with one clic
 - [x]  Folders and single files are supported
 - [x]  Include image attachments
 - [x]  Option for use `GitHub Flavored Markdown Format`
+- [x]  Embed content
 
 
 ## How to Install
