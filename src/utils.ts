@@ -196,11 +196,8 @@ export async function tryCopyMarkdownByRead(
 				const imageLink = imageLinks[index][1];
 				const imageLinkMd5 = md5(imageLink);
 				const imageExt = path.extname(imageLink);
-
-				const hashLink = path.join(
-					plugin.settings.attachment,
-					imageLinkMd5.concat(imageExt)
-				);
+				// Unify the link separator in obsidian as a forward slash instead of the default back slash in windows, so that the referenced images can be displayed properly
+				const hashLink = path.join(plugin.settings.attachment, imageLinkMd5.concat(imageExt)).replace('\\','/');
 
 				if (plugin.settings.GTM) {
 					content = content.replace(
