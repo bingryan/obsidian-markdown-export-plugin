@@ -1,3 +1,17 @@
+# 1.0.4 (Thu Feb 09 2023)
+
+#### 🐛 Bug Fix
+
+- fix: Images are not displayed correctly in the exported markdown docu… [#28](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/28) ([@martinniee](https://github.com/martinniee))
+- update readme [#24](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/24) ([@bingryan](https://github.com/bingryan))
+
+#### Authors: 2
+
+- [@bingryan](https://github.com/bingryan)
+- Nathanie ([@martinniee](https://github.com/martinniee))
+
+---
+
 # 1.0.3 (Tue Dec 20 2022)
 
 #### 🐛 Bug Fix
