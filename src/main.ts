@@ -102,7 +102,7 @@ class MarkdownExportSettingTab extends PluginSettingTab {
 					.setPlaceholder("Enter attachment path")
 					.setValue(this.plugin.settings.attachment)
 					.onChange(async (value) => {
-						this.plugin.settings.output = value;
+						this.plugin.settings.attachment = value;
 						await this.plugin.saveSettings();
 					})
 			);
