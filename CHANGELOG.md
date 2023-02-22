@@ -1,3 +1,15 @@
+# 1.0.5 (Wed Feb 22 2023)
+
+#### 🐛 Bug Fix
+
+- fix: setting error [#31](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/31) ([@bingryan](https://github.com/bingryan))
+
+#### Authors: 1
+
+- [@bingryan](https://github.com/bingryan)
+
+---
+
 # 1.0.4 (Thu Feb 09 2023)
 
 #### 🐛 Bug Fix
