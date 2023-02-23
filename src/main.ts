@@ -8,7 +8,6 @@ import {
 } from "obsidian";
 import * as path from "path";
 
-
 import { MarkdownExportPluginSettings, DEFAULT_SETTINGS } from "./config";
 import { tryCreateFolder, tryRun } from "./utils";
 

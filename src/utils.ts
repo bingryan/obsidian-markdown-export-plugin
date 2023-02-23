@@ -1,8 +1,13 @@
 import * as path from "path";
 import md5 from "md5";
-import {  TAbstractFile, TFile, TFolder,  htmlToMarkdown } from "obsidian";
+import { TAbstractFile, TFile, TFolder, htmlToMarkdown } from "obsidian";
 
-import { ATTACHMENT_URL_REGEXP, EMBED_URL_REGEXP, GMT_IMAGE_FORMAT } from "./config";
+import {
+	ATTACHMENT_URL_REGEXP,
+	MARKDOWN_ATTACHMENT_URL_REGEXP,
+	EMBED_URL_REGEXP,
+	GMT_IMAGE_FORMAT,
+} from "./config";
 import MarkdownExportPlugin from "./main";
 
 type CopyMarkdownOptions = {
@@ -12,7 +17,10 @@ type CopyMarkdownOptions = {
 
 export async function getImageLinks(markdown: string) {
 	const imageLinks = markdown.matchAll(ATTACHMENT_URL_REGEXP);
-	return Array.from(imageLinks);
+	const markdownImageLinks = markdown.matchAll(
+		MARKDOWN_ATTACHMENT_URL_REGEXP
+	);
+	return Array.from(imageLinks).concat(Array.from(markdownImageLinks));
 }
 
 export async function getEmbeds(markdown: string) {
@@ -111,15 +119,24 @@ export async function tryCopyImage(
 			.then(async (content) => {
 				const imageLinks = await getImageLinks(content);
 				for (const index in imageLinks) {
-					const imageLink = imageLinks[index][1];
+					const imageLink =
+						imageLinks[index][imageLinks[index].length - 3];
 
 					const imageLinkMd5 = md5(imageLink);
 					const imageExt = path.extname(imageLink);
-					const ifile = plugin.app.metadataCache.getFirstLinkpathDest(imageLink, contentPath);
-					if (ifile){
+					const ifile = plugin.app.metadataCache.getFirstLinkpathDest(
+						imageLink,
+						contentPath
+					);
+
+					const filePath =
+						ifile !== null
+							? ifile.path
+							: path.join(path.dirname(contentPath), imageLink);
+
 					plugin.app.vault.adapter
 						.copy(
-							ifile.path,
+							filePath,
 							path.join(
 								plugin.settings.output,
 								plugin.settings.attachment,
@@ -133,7 +150,6 @@ export async function tryCopyImage(
 								throw error;
 							}
 						});
-					}
 				}
 			});
 	} catch (error) {
@@ -160,28 +176,38 @@ export async function tryCopyMarkdown(
 	}
 }
 
-export async function getEmbedMap(plugin: MarkdownExportPlugin, content: string, path: string) {
-    // key：link url 
-    // value： embed content parse from html document
+export async function getEmbedMap(
+	plugin: MarkdownExportPlugin,
+	content: string,
+	path: string
+) {
+	// key：link url
+	// value： embed content parse from html document
 	const embedMap = new Map();
-	const embedList = Array.from(document.documentElement.getElementsByClassName('internal-embed'));
+	const embedList = Array.from(
+		document.documentElement.getElementsByClassName("internal-embed")
+	);
 
-
-    Array.from(embedList).forEach((el) => {
-      // markdown-embed-content markdown-embed-page
-      const embedContentHtml = el.getElementsByClassName('markdown-embed-content')[0];
+	Array.from(embedList).forEach((el) => {
+		// markdown-embed-content markdown-embed-page
+		const embedContentHtml = el.getElementsByClassName(
+			"markdown-embed-content"
+		)[0];
 
 		if (embedContentHtml) {
 			let embedValue = htmlToMarkdown(embedContentHtml.innerHTML);
-			embedValue = '> ' + (embedValue as string).replaceAll('# \n\n', '# ').replaceAll('\n', '\n> ');
+			embedValue =
+				"> " +
+				(embedValue as string)
+					.replaceAll("# \n\n", "# ")
+					.replaceAll("\n", "\n> ");
 			const embedKey = el.getAttribute("src");
 			embedMap.set(embedKey, embedValue);
 		}
-    });
+	});
 
-    return embedMap;
-  }
-
+	return embedMap;
+}
 
 export async function tryCopyMarkdownByRead(
 	plugin: MarkdownExportPlugin,
@@ -193,11 +219,17 @@ export async function tryCopyMarkdownByRead(
 
 			for (const index in imageLinks) {
 				const rawImageLink = imageLinks[index][0];
-				const imageLink = imageLinks[index][1];
+				const imageLink =
+					imageLinks[index][imageLinks[index].length - 3];
 				const imageLinkMd5 = md5(imageLink);
 				const imageExt = path.extname(imageLink);
 				// Unify the link separator in obsidian as a forward slash instead of the default back slash in windows, so that the referenced images can be displayed properly
-				const hashLink = path.join(plugin.settings.attachment, imageLinkMd5.concat(imageExt)).replace('\\','/');
+				const hashLink = path
+					.join(
+						plugin.settings.attachment,
+						imageLinkMd5.concat(imageExt)
+					)
+					.replace("\\", "/");
 
 				if (plugin.settings.GTM) {
 					content = content.replace(
@@ -209,15 +241,17 @@ export async function tryCopyMarkdownByRead(
 				}
 			}
 			const cfile = plugin.app.workspace.getActiveFile();
-			if (cfile != undefined){
+			if (cfile != undefined) {
 				const embedMap = await getEmbedMap(plugin, content, cfile.path);
 				const embeds = await getEmbeds(content);
 				for (const index in embeds) {
 					const url = embeds[index][1];
-					content = content.replace(embeds[index][0], embedMap.get(url));
+					content = content.replace(
+						embeds[index][0],
+						embedMap.get(url)
+					);
 				}
 			}
-			
 
 			await tryCopyImage(plugin, file.path);
 			await tryCreateFolder(
