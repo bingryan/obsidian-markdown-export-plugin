@@ -1,3 +1,15 @@
+# 1.0.6 (Thu Feb 23 2023)
+
+#### 🐛 Bug Fix
+
+- add markdowm image link [#33](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/33) ([@bingryan](https://github.com/bingryan))
+
+#### Authors: 1
+
+- [@bingryan](https://github.com/bingryan)
+
+---
+
 # 1.0.5 (Wed Feb 22 2023)
 
 #### 🐛 Bug Fix
