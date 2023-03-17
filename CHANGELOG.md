@@ -1,3 +1,15 @@
+# 1.0.7 (Fri Mar 17 2023)
+
+#### 🐛 Bug Fix
+
+- Call decodeURI before resolving paths [#35](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/35) ([@mnaoumov](https://github.com/mnaoumov))
+
+#### Authors: 1
+
+- Michael Naumov ([@mnaoumov](https://github.com/mnaoumov))
+
+---
+
 # 1.0.6 (Thu Feb 23 2023)
 
 #### 🐛 Bug Fix
