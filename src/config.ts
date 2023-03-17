@@ -1,4 +1,4 @@
-export const ATTACHMENT_URL_REGEXP = /!\[\[((.*?)\.(\w+))\]\]/g;
+export const ATTACHMENT_URL_REGEXP = /!\[?\[((.*?)\.(\w+))\]\]?/g;
 export const MARKDOWN_ATTACHMENT_URL_REGEXP = /!\[(.*?)\]\(((.*?)\.(\w+))\)/g;
 export const EMBED_URL_REGEXP = /!\[\[(.*?)\]\]/g;
 
