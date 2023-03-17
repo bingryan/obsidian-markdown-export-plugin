@@ -119,8 +119,10 @@ export async function tryCopyImage(
 			.then(async (content) => {
 				const imageLinks = await getImageLinks(content);
 				for (const index in imageLinks) {
-					const imageLink =
+					const urlEncodedImageLink =
 						imageLinks[index][imageLinks[index].length - 3];
+					const imageLink =
+						decodeURI(urlEncodedImageLink);
 
 					const imageLinkMd5 = md5(imageLink);
 					const imageExt = path.extname(imageLink);
@@ -219,8 +221,9 @@ export async function tryCopyMarkdownByRead(
 
 			for (const index in imageLinks) {
 				const rawImageLink = imageLinks[index][0];
-				const imageLink =
+				const urlEncodedImageLink =
 					imageLinks[index][imageLinks[index].length - 3];
+				const imageLink = decodeURI(urlEncodedImageLink);
 				const imageLinkMd5 = md5(imageLink);
 				const imageExt = path.extname(imageLink);
 				// Unify the link separator in obsidian as a forward slash instead of the default back slash in windows, so that the referenced images can be displayed properly
@@ -237,7 +240,7 @@ export async function tryCopyMarkdownByRead(
 						GMT_IMAGE_FORMAT.format(hashLink)
 					);
 				} else {
-					content = content.replace(imageLink, hashLink);
+					content = content.replace(urlEncodedImageLink, hashLink);
 				}
 			}
 			const cfile = plugin.app.workspace.getActiveFile();
