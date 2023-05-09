@@ -20,6 +20,7 @@ export async function getImageLinks(markdown: string) {
 	const markdownImageLinks = markdown.matchAll(
 		MARKDOWN_ATTACHMENT_URL_REGEXP
 	);
+	// console.log("getImageLinks: ", Array.from(imageLinks).concat(Array.from(markdownImageLinks)));
 	return Array.from(imageLinks).concat(Array.from(markdownImageLinks));
 }
 
@@ -136,6 +137,11 @@ export async function tryCopyImage(
 							? ifile.path
 							: path.join(path.dirname(contentPath), imageLink);
 
+					// filter markdown link eg: http://xxx.png
+					if (urlEncodedImageLink.startsWith("http")) {
+						continue;
+					}
+
 					plugin.app.vault.adapter
 						.copy(
 							filePath,
@@ -233,6 +239,11 @@ export async function tryCopyMarkdownByRead(
 						imageLinkMd5.concat(imageExt)
 					)
 					.replace("\\", "/");
+
+				// filter markdown link eg: http://xxx.png
+				if (urlEncodedImageLink.startsWith("http")) {
+					continue;
+				}
 
 				if (plugin.settings.GTM) {
 					content = content.replace(
