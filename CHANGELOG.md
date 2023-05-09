@@ -1,3 +1,15 @@
+# 1.0.8 (Tue May 09 2023)
+
+#### 🐛 Bug Fix
+
+- fix: filter http link [#38](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/38) ([@bingryan](https://github.com/bingryan))
+
+#### Authors: 1
+
+- [@bingryan](https://github.com/bingryan)
+
+---
+
 # 1.0.7 (Fri Mar 17 2023)
 
 #### 🐛 Bug Fix
