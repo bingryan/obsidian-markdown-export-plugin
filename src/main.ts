@@ -1,15 +1,19 @@
 import {
 	App,
+	Menu,
 	MenuItem,
 	Notice,
 	Plugin,
 	PluginSettingTab,
 	Setting,
+	TAbstractFile,
 } from "obsidian";
 import * as path from "path";
 
+
 import { MarkdownExportPluginSettings, DEFAULT_SETTINGS } from "./config";
 import { tryCreateFolder, tryRun } from "./utils";
+
 
 export default class MarkdownExportPlugin extends Plugin {
 	settings: MarkdownExportPluginSettings;
@@ -22,35 +26,53 @@ export default class MarkdownExportPlugin extends Plugin {
 
 		this.registerEvent(
 			this.app.workspace.on("file-menu", (menu, file) => {
-				const addMenuItem = (item: MenuItem) => {
-					item.setTitle("Export all to package");
-					item.onClick(async () => {
-						// try create attachment directory
-						await tryCreateFolder(
-							this,
-							path.join(
-								this.settings.output,
-								this.settings.attachment
-							)
-						);
-
-						// run
-						await tryRun(this, file);
-
-						new Notice(
-							`Exporting ${file.path} to ${path.join(
-								this.settings.output,
-								file.name
-							)}`
-						);
-					});
-				};
-				menu.addItem(addMenuItem);
+				// dir/file menu
+				this.registerDirMenu(menu, file);
+				// file menu
+				// if ((<TFile>file).extension) {
+				// 	const addFileMenuItem = (item: MenuItem) => {
+				// 		item.setTitle("Export to HTML");
+				// 		item.onClick(async () => {
+				// 			new Notice(
+				// 				`Export to HTML`
+				// 			);
+				// 		});
+				// 	}
+				// 	menu.addItem(addFileMenuItem);
+				// }
 			})
 		);
 	}
 
-	onunload() {}
+	registerDirMenu(menu: Menu, file: TAbstractFile) {
+		for (const outputFormat of ['markdown', 'HTML']) {
+			const addMenuItem = (item: MenuItem) => {
+				item.setTitle(`Export to ${outputFormat}`);
+				item.onClick(async () => {
+					// try create attachment directory
+					await tryCreateFolder(
+						this,
+						path.join(
+							this.settings.output,
+							this.settings.attachment
+						)
+					);
+
+					// run
+					await tryRun(this, file, outputFormat);
+
+					new Notice(
+						`Exporting ${file.path} to ${path.join(
+							this.settings.output,
+							file.name
+						)}`
+					);
+				});
+			};
+			menu.addItem(addMenuItem);
+		}
+	}
+	onunload() { }
 
 	async loadSettings() {
 		this.settings = Object.assign(
