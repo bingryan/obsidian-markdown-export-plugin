@@ -14,6 +14,7 @@ It allows you to export markdown to a package (including pictures) with one clic
 - [x]  Include image attachments
 - [x]  Option for use `GitHub Flavored Markdown Format`
 - [x]  Embed content
+- [x]  support output format: `html`, `md`
 
 
 ## How to Install
