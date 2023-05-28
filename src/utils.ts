@@ -9,9 +9,11 @@ import {
 	GMT_IMAGE_FORMAT,
 } from "./config";
 import MarkdownExportPlugin from "./main";
+import markdownToHTML from './renderer';
 
 type CopyMarkdownOptions = {
 	file: TAbstractFile;
+	outputFormat: string;
 	outputSubPath: string;
 };
 
@@ -33,6 +35,7 @@ export async function getEmbeds(markdown: string) {
 export function allMarkdownParams(
 	file: TAbstractFile,
 	out: Array<CopyMarkdownOptions>,
+	outputFormat = "markdown",
 	outputSubPath = ".",
 	parentPath = ""
 ): Array<CopyMarkdownOptions> {
@@ -48,12 +51,14 @@ export function allMarkdownParams(
 					allMarkdownParams(
 						absFile,
 						out,
+						outputFormat,
 						outputSubPath,
 						outputSubPath
 					);
 				} else {
 					out.push({
 						file: absFile,
+						outputFormat,
 						outputSubPath,
 					});
 				}
@@ -61,6 +66,7 @@ export function allMarkdownParams(
 		} else {
 			out.push({
 				file,
+				outputFormat,
 				outputSubPath,
 			});
 		}
@@ -72,7 +78,8 @@ export function allMarkdownParams(
 
 export async function tryRun(
 	plugin: MarkdownExportPlugin,
-	file: TAbstractFile
+	file: TAbstractFile,
+	outputFormat = 'markdown'
 ) {
 	// recursive functions are not suitable for this case
 	// if ((<TFile>file).extension) {
@@ -86,7 +93,7 @@ export async function tryRun(
 	// }
 
 	try {
-		const params = allMarkdownParams(file, []);
+		const params = allMarkdownParams(file, [], outputFormat);
 		for (const param of params) {
 			await tryCopyMarkdownByRead(plugin, param);
 		}
@@ -105,6 +112,20 @@ export async function tryCreateFolder(
 		await plugin.app.vault.createFolder(path);
 	} catch (error) {
 		if (!error.message.contains("Folder already exists")) {
+			throw error;
+		}
+	}
+}
+
+export async function tryCreate(
+	plugin: MarkdownExportPlugin,
+	path: string,
+	data: string
+) {
+	try {
+		await plugin.app.vault.create(path, data);
+	} catch (error) {
+		if (!error.message.contains("file already exists")) {
 			throw error;
 		}
 	}
@@ -219,7 +240,7 @@ export async function getEmbedMap(
 
 export async function tryCopyMarkdownByRead(
 	plugin: MarkdownExportPlugin,
-	{ file, outputSubPath = "." }: CopyMarkdownOptions
+	{ file, outputFormat, outputSubPath = "." }: CopyMarkdownOptions
 ) {
 	try {
 		await plugin.app.vault.adapter.read(file.path).then(async (content) => {
@@ -268,15 +289,35 @@ export async function tryCopyMarkdownByRead(
 			}
 
 			await tryCopyImage(plugin, file.path);
+
+			const outDir = path.join(plugin.settings.output, outputSubPath)
 			await tryCreateFolder(
 				plugin,
-				path.join(plugin.settings.output, outputSubPath)
+				outDir
 			);
 
-			plugin.app.vault.adapter.write(
-				path.join(plugin.settings.output, outputSubPath, file.name),
-				content
-			);
+			switch (outputFormat) {
+				case "HTML": {
+					const targetFile = path.join(outDir, file.name.replace(".md", ".html"));
+					const { html } = await markdownToHTML(plugin, file.path, content)
+					await tryCreate(
+						plugin,
+						targetFile,
+						html
+					);
+					break;
+				}
+				case "markdown": {
+					const targetFile = path.join(outDir, file.name);
+					await tryCreate(
+						plugin,
+						targetFile,
+						content
+					);
+					break;
+				}
+
+			}
 		});
 	} catch (error) {
 		if (!error.message.contains("file already exists")) {
