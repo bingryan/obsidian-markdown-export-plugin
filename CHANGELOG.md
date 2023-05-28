@@ -1,3 +1,15 @@
+# 1.0.9 (Sun May 28 2023)
+
+#### 🐛 Bug Fix
+
+- feat: add export html [#39](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/39) ([@bingryan](https://github.com/bingryan))
+
+#### Authors: 1
+
+- [@bingryan](https://github.com/bingryan)
+
+---
+
 # 1.0.8 (Tue May 09 2023)
 
 #### 🐛 Bug Fix
