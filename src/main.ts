@@ -48,30 +48,14 @@ export default class MarkdownExportPlugin extends Plugin {
 			id: 'export-to-markdown',
 			name: 'Export to Markdown',
 			callback: async () => {
-				// try create attachment directory
-				await tryCreateFolder(
-					this,
-					path.join(
-						this.settings.output,
-						this.settings.attachment
-					)
-				);
-
-				// run
-				// Get the currently opened Obsidian file
 				const file = this.app.workspace.getActiveFile();
 				if (!file) {
-					new Notice("No active file");
+					new Notice(
+						`No active file`
+					);
 					return;
 				}
-				await tryRun(this, file, 'markdown');
-
-				new Notice(
-					`Exporting ${file.path} to ${path.join(
-						this.settings.output,
-						file.name
-					)}`
-				);
+				this.createFolderAndRun(file, 'markdown');
 			}
 		});
 	}
@@ -81,29 +65,33 @@ export default class MarkdownExportPlugin extends Plugin {
 			const addMenuItem = (item: MenuItem) => {
 				item.setTitle(`Export to ${outputFormat}`);
 				item.onClick(async () => {
-					// try create attachment directory
-					await tryCreateFolder(
-						this,
-						path.join(
-							this.settings.output,
-							this.settings.attachment
-						)
-					);
-
-					// run
-					await tryRun(this, file, outputFormat);
-
-					new Notice(
-						`Exporting ${file.path} to ${path.join(
-							this.settings.output,
-							file.name
-						)}`
-					);
+					await this.createFolderAndRun(file, outputFormat);
 				});
 			};
 			menu.addItem(addMenuItem);
 		}
 	}
+	private async createFolderAndRun(file: TAbstractFile, outputFormat: string) {
+		// try create attachment directory
+		await tryCreateFolder(
+			this,
+			path.join(
+				this.settings.output,
+				this.settings.attachment
+			)
+		);
+
+		// run
+		await tryRun(this, file, outputFormat);
+
+		new Notice(
+			`Exporting ${file.path} to ${path.join(
+				this.settings.output,
+				file.name
+			)}`
+		);
+	}
+
 	onunload() { }
 
 	async loadSettings() {
