@@ -1,3 +1,17 @@
+# 1.0.10 (Wed Jun 14 2023)
+
+#### 🐛 Bug Fix
+
+- Create Obsidian commands [#42](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/42) ([@Neykah](https://github.com/Neykah))
+- update readme [#40](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/40) ([@bingryan](https://github.com/bingryan))
+
+#### Authors: 2
+
+- [@bingryan](https://github.com/bingryan)
+- Morgan Lefranc ([@Neykah](https://github.com/Neykah))
+
+---
+
 # 1.0.9 (Sun May 28 2023)
 
 #### 🐛 Bug Fix
