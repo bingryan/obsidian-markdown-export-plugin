@@ -42,6 +42,23 @@ export default class MarkdownExportPlugin extends Plugin {
 				// }
 			})
 		);
+
+		for (const outputFormat of ['markdown', 'HTML']) {
+			this.addCommand({
+				id: 'export-to-' + outputFormat,
+				name: `Export to ${outputFormat}`,
+				callback: async () => {
+					const file = this.app.workspace.getActiveFile();
+					if (!file) {
+						new Notice(
+							`No active file`
+						);
+						return;
+					}
+					this.createFolderAndRun(file, outputFormat);
+				}
+			});
+		}
 	}
 
 	registerDirMenu(menu: Menu, file: TAbstractFile) {
@@ -49,29 +66,33 @@ export default class MarkdownExportPlugin extends Plugin {
 			const addMenuItem = (item: MenuItem) => {
 				item.setTitle(`Export to ${outputFormat}`);
 				item.onClick(async () => {
-					// try create attachment directory
-					await tryCreateFolder(
-						this,
-						path.join(
-							this.settings.output,
-							this.settings.attachment
-						)
-					);
-
-					// run
-					await tryRun(this, file, outputFormat);
-
-					new Notice(
-						`Exporting ${file.path} to ${path.join(
-							this.settings.output,
-							file.name
-						)}`
-					);
+					await this.createFolderAndRun(file, outputFormat);
 				});
 			};
 			menu.addItem(addMenuItem);
 		}
 	}
+	private async createFolderAndRun(file: TAbstractFile, outputFormat: string) {
+		// try create attachment directory
+		await tryCreateFolder(
+			this,
+			path.join(
+				this.settings.output,
+				this.settings.attachment
+			)
+		);
+
+		// run
+		await tryRun(this, file, outputFormat);
+
+		new Notice(
+			`Exporting ${file.path} to ${path.join(
+				this.settings.output,
+				file.name
+			)}`
+		);
+	}
+
 	onunload() { }
 
 	async loadSettings() {
