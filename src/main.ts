@@ -43,21 +43,22 @@ export default class MarkdownExportPlugin extends Plugin {
 			})
 		);
 
-		// This adds a simple command that can be triggered anywhere
-		this.addCommand({
-			id: 'export-to-markdown',
-			name: 'Export to Markdown',
-			callback: async () => {
-				const file = this.app.workspace.getActiveFile();
-				if (!file) {
-					new Notice(
-						`No active file`
-					);
-					return;
+		for (const outputFormat of ['markdown', 'HTML']) {
+			this.addCommand({
+				id: 'export-to-' + outputFormat,
+				name: `Export to ${outputFormat}`,
+				callback: async () => {
+					const file = this.app.workspace.getActiveFile();
+					if (!file) {
+						new Notice(
+							`No active file`
+						);
+						return;
+					}
+					this.createFolderAndRun(file, outputFormat);
 				}
-				this.createFolderAndRun(file, 'markdown');
-			}
-		});
+			});
+		}
 	}
 
 	registerDirMenu(menu: Menu, file: TAbstractFile) {
