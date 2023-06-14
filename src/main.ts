@@ -42,6 +42,38 @@ export default class MarkdownExportPlugin extends Plugin {
 				// }
 			})
 		);
+
+		// This adds a simple command that can be triggered anywhere
+		this.addCommand({
+			id: 'export-to-markdown',
+			name: 'Export to Markdown',
+			callback: async () => {
+				// try create attachment directory
+				await tryCreateFolder(
+					this,
+					path.join(
+						this.settings.output,
+						this.settings.attachment
+					)
+				);
+
+				// run
+				// Get the currently opened Obsidian file
+				const file = this.app.workspace.getActiveFile();
+				if (!file) {
+					new Notice("No active file");
+					return;
+				}
+				await tryRun(this, file, 'markdown');
+
+				new Notice(
+					`Exporting ${file.path} to ${path.join(
+						this.settings.output,
+						file.name
+					)}`
+				);
+			}
+		});
 	}
 
 	registerDirMenu(menu: Menu, file: TAbstractFile) {
