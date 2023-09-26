@@ -156,9 +156,9 @@ class MarkdownExportSettingTab extends PluginSettingTab {
 			)
 			.addToggle((toggle) =>
 				toggle
-					.setValue(this.plugin.settings.GTM)
+					.setValue(this.plugin.settings.GFM)
 					.onChange(async (value: boolean) => {
-						this.plugin.settings.GTM = value;
+						this.plugin.settings.GFM = value;
 						await this.plugin.saveSettings();
 					})
 			);

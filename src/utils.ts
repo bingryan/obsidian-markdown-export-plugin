@@ -6,7 +6,7 @@ import {
 	ATTACHMENT_URL_REGEXP,
 	MARKDOWN_ATTACHMENT_URL_REGEXP,
 	EMBED_URL_REGEXP,
-	GMT_IMAGE_FORMAT,
+	GFM_IMAGE_FORMAT,
 } from "./config";
 import MarkdownExportPlugin from "./main";
 import markdownToHTML from './renderer';
@@ -266,10 +266,10 @@ export async function tryCopyMarkdownByRead(
 					continue;
 				}
 
-				if (plugin.settings.GTM) {
+				if (plugin.settings.GFM) {
 					content = content.replace(
 						rawImageLink,
-						GMT_IMAGE_FORMAT.format(hashLink)
+						GFM_IMAGE_FORMAT.format(hashLink)
 					);
 				} else {
 					content = content.replace(urlEncodedImageLink, hashLink);
