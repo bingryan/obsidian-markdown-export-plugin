@@ -1,4 +1,5 @@
 import * as path from "path";
+import * as fs from "fs";
 import md5 from "md5";
 import { TAbstractFile, TFile, TFolder, htmlToMarkdown } from "obsidian";
 
@@ -9,7 +10,7 @@ import {
 	GFM_IMAGE_FORMAT,
 } from "./config";
 import MarkdownExportPlugin from "./main";
-import markdownToHTML from './renderer';
+import markdownToHTML from "./renderer";
 
 type CopyMarkdownOptions = {
 	file: TAbstractFile;
@@ -79,7 +80,7 @@ export function allMarkdownParams(
 export async function tryRun(
 	plugin: MarkdownExportPlugin,
 	file: TAbstractFile,
-	outputFormat = 'markdown'
+	outputFormat = "markdown"
 ) {
 	// recursive functions are not suitable for this case
 	// if ((<TFile>file).extension) {
@@ -104,12 +105,46 @@ export async function tryRun(
 	}
 }
 
+export function getResourceOsPath(
+	plugin: MarkdownExportPlugin,
+	resouorce: TFile | null
+): string {
+	if (resouorce === null) {
+		return ".";
+	}
+	const appPath = plugin.app.vault.getResourcePath(resouorce);
+
+	const match = appPath.match(/app:\/\/(.*?)\//);
+	if (match) {
+		const hash = match[1];
+		const result = appPath.replace(`app://${hash}/`, "/").split("?")[0];
+		return decodeURIComponent(result);
+	}
+	return ".";
+}
+
+export function fileExists(path: string): boolean {
+	try {
+		return fs.statSync(path).isFile();
+	} catch (error) {
+		if (error.code === "ENOENT") {
+			return false;
+		} else {
+			throw error;
+		}
+	}
+}
+
 export async function tryCreateFolder(
 	plugin: MarkdownExportPlugin,
 	path: string
 ) {
 	try {
-		await plugin.app.vault.createFolder(path);
+		if (path.startsWith("/")) {
+			fs.mkdirSync(path, { recursive: true });
+		} else {
+			await plugin.app.vault.createFolder(path);
+		}
 	} catch (error) {
 		if (!error.message.contains("Folder already exists")) {
 			throw error;
@@ -123,7 +158,11 @@ export async function tryCreate(
 	data: string
 ) {
 	try {
-		await plugin.app.vault.create(path, data);
+		if (path.startsWith("/")) {
+			fs.writeFileSync(path, data);
+		} else {
+			await plugin.app.vault.create(path, data);
+		}
 	} catch (error) {
 		if (!error.message.contains("file already exists")) {
 			throw error;
@@ -143,8 +182,7 @@ export async function tryCopyImage(
 				for (const index in imageLinks) {
 					const urlEncodedImageLink =
 						imageLinks[index][imageLinks[index].length - 3];
-					const imageLink =
-						decodeURI(urlEncodedImageLink);
+					const imageLink = decodeURI(urlEncodedImageLink);
 
 					const imageLinkMd5 = md5(imageLink);
 					const imageExt = path.extname(imageLink);
@@ -163,22 +201,32 @@ export async function tryCopyImage(
 						continue;
 					}
 
-					plugin.app.vault.adapter
-						.copy(
-							filePath,
-							path.join(
-								plugin.settings.output,
-								plugin.settings.attachment,
-								imageLinkMd5.concat(imageExt)
-							)
-						)
-						.catch((error) => {
-							if (
-								!error.message.contains("file already exists")
-							) {
-								throw error;
+					const targetPath = path.join(
+						plugin.settings.output,
+						plugin.settings.attachment,
+						imageLinkMd5.concat(imageExt)
+					);
+
+					try {
+						if (!fileExists(targetPath)) {
+							if (plugin.settings.output.startsWith("/")) {
+								const resourceOsPath = getResourceOsPath(
+									plugin,
+									ifile
+								);
+								fs.copyFileSync(resourceOsPath, targetPath);
+							} else {
+								await plugin.app.vault.adapter.copy(
+									filePath,
+									targetPath
+								);
 							}
-						});
+						}
+					} catch (error) {
+						console.error(
+							`Failed to copy file from ${filePath} to ${targetPath}: ${error.message}`
+						);
+					}
 				}
 			});
 	} catch (error) {
@@ -290,33 +338,28 @@ export async function tryCopyMarkdownByRead(
 
 			await tryCopyImage(plugin, file.path);
 
-			const outDir = path.join(plugin.settings.output, outputSubPath)
-			await tryCreateFolder(
-				plugin,
-				outDir
-			);
+			const outDir = path.join(plugin.settings.output, outputSubPath);
+			await tryCreateFolder(plugin, outDir);
 
 			switch (outputFormat) {
 				case "HTML": {
-					const targetFile = path.join(outDir, file.name.replace(".md", ".html"));
-					const { html } = await markdownToHTML(plugin, file.path, content)
-					await tryCreate(
-						plugin,
-						targetFile,
-						html
+					const targetFile = path.join(
+						outDir,
+						file.name.replace(".md", ".html")
 					);
+					const { html } = await markdownToHTML(
+						plugin,
+						file.path,
+						content
+					);
+					await tryCreate(plugin, targetFile, html);
 					break;
 				}
 				case "markdown": {
 					const targetFile = path.join(outDir, file.name);
-					await tryCreate(
-						plugin,
-						targetFile,
-						content
-					);
+					await tryCreate(plugin, targetFile, content);
 					break;
 				}
-
 			}
 		});
 	} catch (error) {

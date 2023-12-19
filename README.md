@@ -16,6 +16,10 @@ It allows you to export markdown to a package (including pictures) with one clic
 - [x]  Embed content
 - [x]  support output format: `html`, `md`
 
+> \[!IMPORTANT]
+>
+> if you want set output outside of vault, set output use os absolute path, such as: `/Users/xxx/Documents/Output`
+
 
 ## How to Install
 
