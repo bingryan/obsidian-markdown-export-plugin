@@ -1,3 +1,15 @@
+# 1.0.12 (Tue Dec 19 2023)
+
+#### 🐛 Bug Fix
+
+- feat: support set output outside of vault [#53](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/53) ([@bingryan](https://github.com/bingryan))
+
+#### Authors: 1
+
+- [@bingryan](https://github.com/bingryan)
+
+---
+
 # 1.0.11 (Tue Sep 26 2023)
 
 #### 🐛 Bug Fix
