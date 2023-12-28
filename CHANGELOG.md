@@ -1,3 +1,16 @@
+# 1.0.13 (Thu Dec 28 2023)
+
+#### 🐛 Bug Fix
+
+- feat: image path check image dimensions [#56](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/56) ([@bingryan](https://github.com/bingryan))
+- docs: update readme [#54](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/54) ([@bingryan](https://github.com/bingryan))
+
+#### Authors: 1
+
+- [@bingryan](https://github.com/bingryan)
+
+---
+
 # 1.0.12 (Tue Dec 19 2023)
 
 #### 🐛 Bug Fix
