@@ -19,6 +19,9 @@ It allows you to export markdown to a package (including pictures) with one clic
 > \[!IMPORTANT]
 >
 > if you want set output outside of vault, set output use os absolute path, such as: `/Users/xxx/Documents/Output`
+>
+> The assets path should be relative to the markdown output's folder!
+
 
 
 ## How to Install
