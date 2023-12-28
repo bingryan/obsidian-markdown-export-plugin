@@ -187,6 +187,9 @@ export async function tryCopyImage(
 						/\.\.\//g,
 						""
 					);
+					if (imageLink.contains("|")) {
+						imageLink = imageLink.split("|")[0];
+					}
 
 					const imageLinkMd5 = md5(imageLink);
 					const imageExt = path.extname(imageLink);
