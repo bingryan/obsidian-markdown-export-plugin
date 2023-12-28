@@ -23,7 +23,6 @@ export async function getImageLinks(markdown: string) {
 	const markdownImageLinks = markdown.matchAll(
 		MARKDOWN_ATTACHMENT_URL_REGEXP
 	);
-	// console.log("getImageLinks: ", Array.from(imageLinks).concat(Array.from(markdownImageLinks)));
 	return Array.from(imageLinks).concat(Array.from(markdownImageLinks));
 }
 
@@ -181,8 +180,16 @@ export async function tryCopyImage(
 				const imageLinks = await getImageLinks(content);
 				for (const index in imageLinks) {
 					const urlEncodedImageLink =
-						imageLinks[index][imageLinks[index].length - 3];
-					const imageLink = decodeURI(urlEncodedImageLink);
+						imageLinks[index][7 - imageLinks[index].length];
+
+					// decode and replace the relative path
+					let imageLink = decodeURI(urlEncodedImageLink).replace(
+						/\.\.\//g,
+						""
+					);
+					if (imageLink.contains("|")) {
+						imageLink = imageLink.split("|")[0];
+					}
 
 					const imageLinkMd5 = md5(imageLink);
 					const imageExt = path.extname(imageLink);
@@ -293,12 +300,21 @@ export async function tryCopyMarkdownByRead(
 	try {
 		await plugin.app.vault.adapter.read(file.path).then(async (content) => {
 			const imageLinks = await getImageLinks(content);
-
 			for (const index in imageLinks) {
 				const rawImageLink = imageLinks[index][0];
 				const urlEncodedImageLink =
-					imageLinks[index][imageLinks[index].length - 3];
-				const imageLink = decodeURI(urlEncodedImageLink);
+					imageLinks[index][7 - imageLinks[index].length];
+
+				// decode and replace the relative path
+				let imageLink = decodeURI(urlEncodedImageLink).replace(
+					/\.\.\//g,
+					""
+				);
+				// link: https://help.obsidian.md/Linking+notes+and+files/Embedding+files#Embed+an+image+in+a+note
+				// issue: #44 -> figure checkout: ![[name|figure]]
+				if (imageLink.contains("|")) {
+					imageLink = imageLink.split("|")[0];
+				}
 				const imageLinkMd5 = md5(imageLink);
 				const imageExt = path.extname(imageLink);
 				// Unify the link separator in obsidian as a forward slash instead of the default back slash in windows, so that the referenced images can be displayed properly
