@@ -298,7 +298,12 @@ export async function tryCopyMarkdownByRead(
 				const rawImageLink = imageLinks[index][0];
 				const urlEncodedImageLink =
 					imageLinks[index][imageLinks[index].length - 3];
-				const imageLink = decodeURI(urlEncodedImageLink);
+				let imageLink = decodeURI(urlEncodedImageLink);
+				// link: https://help.obsidian.md/Linking+notes+and+files/Embedding+files#Embed+an+image+in+a+note
+				// issue: #44 -> figure checkout: ![[name|figure]]
+				if (rawImageLink.contains("|")) {
+					imageLink = imageLink.split("|")[0];
+				}
 				const imageLinkMd5 = md5(imageLink);
 				const imageExt = path.extname(imageLink);
 				// Unify the link separator in obsidian as a forward slash instead of the default back slash in windows, so that the referenced images can be displayed properly
