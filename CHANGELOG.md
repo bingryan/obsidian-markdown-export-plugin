@@ -1,3 +1,15 @@
+# 1.0.14 (Sat Dec 30 2023)
+
+#### 🐛 Bug Fix
+
+- fix: attachment  path [#58](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/58) ([@bingryan](https://github.com/bingryan))
+
+#### Authors: 1
+
+- [@bingryan](https://github.com/bingryan)
+
+---
+
 # 1.0.13 (Thu Dec 28 2023)
 
 #### 🐛 Bug Fix
