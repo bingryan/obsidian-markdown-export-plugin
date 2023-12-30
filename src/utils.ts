@@ -122,6 +122,18 @@ export function getResourceOsPath(
 	return ".";
 }
 
+/**
+ *
+ * @param path a/b/c.md
+ * @returns click path: unix: ../../ or windows: ..\..\, but need: ../
+ */
+export function getClickSubRoute(p: string): string {
+	const parentLevels = p.split(path.sep).length - 1;
+	const parentRoute = ".." + path.sep;
+
+	return parentRoute.repeat(parentLevels - 1);
+}
+
 export function fileExists(path: string): boolean {
 	try {
 		return fs.statSync(path).isFile();
@@ -318,8 +330,12 @@ export async function tryCopyMarkdownByRead(
 				const imageLinkMd5 = md5(imageLink);
 				const imageExt = path.extname(imageLink);
 				// Unify the link separator in obsidian as a forward slash instead of the default back slash in windows, so that the referenced images can be displayed properly
+
+				const clickSubRoute = getClickSubRoute(file.path);
+
 				const hashLink = path
 					.join(
+						clickSubRoute,
 						plugin.settings.attachment,
 						imageLinkMd5.concat(imageExt)
 					)
