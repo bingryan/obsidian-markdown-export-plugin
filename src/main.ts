@@ -138,7 +138,7 @@ class MarkdownExportSettingTab extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName("Custom attachment path(optional)")
-			.setDesc("attachment path")
+			.setDesc("attachment path, relative to the output path")
 			.addText((text) =>
 				text
 					.setPlaceholder("Enter attachment path")
