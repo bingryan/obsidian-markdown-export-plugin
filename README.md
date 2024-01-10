@@ -23,6 +23,8 @@ It allows you to export markdown to a package (including pictures) with one clic
 > The assets path should be relative to the markdown output's folder!
 
 
+> \[!NOTE]
+> For Windows users, use `/` instead of `\` in the path.
 
 ## How to Install
 
