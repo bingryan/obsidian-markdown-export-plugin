@@ -125,11 +125,11 @@ export function getResourceOsPath(
 /**
  *
  * @param path a/b/c.md
- * @returns click path: unix: ../../ or windows: ..\..\, but need: ../
+ * @returns click path: unix: ../../ or windows(default): ../../, but need: ../
  */
-export function getClickSubRoute(p: string): string {
-	const parentLevels = p.split(path.sep).length - 1;
-	const parentRoute = ".." + path.sep;
+export function getClickSubRoute(p: string, sep = "/"): string {
+	const parentLevels = p.split(sep).length - 1;
+	const parentRoute = ".." + sep;
 
 	return parentRoute.repeat(parentLevels - 1);
 }
@@ -220,11 +220,13 @@ export async function tryCopyImage(
 						continue;
 					}
 
-					const targetPath = path.join(
-						plugin.settings.output,
-						plugin.settings.attachment,
-						imageLinkMd5.concat(imageExt)
-					);
+					const targetPath = path
+						.join(
+							plugin.settings.output,
+							plugin.settings.attachment,
+							imageLinkMd5.concat(imageExt)
+						)
+						.replace(/\\/g, "/");
 
 					try {
 						if (!fileExists(targetPath)) {
@@ -339,7 +341,7 @@ export async function tryCopyMarkdownByRead(
 						plugin.settings.attachment,
 						imageLinkMd5.concat(imageExt)
 					)
-					.replace("\\", "/");
+					.replace(/\\/g, "/");
 
 				// filter markdown link eg: http://xxx.png
 				if (urlEncodedImageLink.startsWith("http")) {
