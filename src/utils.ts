@@ -116,7 +116,9 @@ export function getResourceOsPath(
 	const match = appPath.match(/app:\/\/(.*?)\//);
 	if (match) {
 		const hash = match[1];
-		const result = appPath.replace(`app://${hash}/`, "/").split("?")[0];
+		const result = appPath
+			.replace(`app://${hash}/`, process.platform === "win32" ? "" : "/")
+			.split("?")[0];
 		return decodeURIComponent(result);
 	}
 	return ".";
@@ -128,10 +130,13 @@ export function getResourceOsPath(
  * @returns click path: unix: ../../ or windows(default): ../../, but need: ../
  */
 export function getClickSubRoute(p: string, sep = "/"): string {
-	const parentLevels = p.split(sep).length - 1;
+	if (p === ".") {
+		return "";
+	}
+	const parentLevels = p.split(sep).length;
 	const parentRoute = ".." + sep;
 
-	return parentRoute.repeat(parentLevels - 1);
+	return parentRoute.repeat(parentLevels);
 }
 
 export function fileExists(path: string): boolean {
@@ -146,15 +151,17 @@ export function fileExists(path: string): boolean {
 	}
 }
 
-export async function tryCreateFolder(
-	plugin: MarkdownExportPlugin,
-	path: string
-) {
+/**
+ *  try create folder
+ * @param plugin
+ * @param p path to create
+ */
+export async function tryCreateFolder(plugin: MarkdownExportPlugin, p: string) {
 	try {
-		if (path.startsWith("/")) {
-			fs.mkdirSync(path, { recursive: true });
+		if (p.startsWith("/") || path.win32.isAbsolute(p)) {
+			fs.mkdirSync(p, { recursive: true });
 		} else {
-			await plugin.app.vault.createFolder(path);
+			await plugin.app.vault.createFolder(p);
 		}
 	} catch (error) {
 		if (!error.message.contains("Folder already exists")) {
@@ -163,16 +170,22 @@ export async function tryCreateFolder(
 	}
 }
 
+/**
+ * try create file
+ * @param plugin
+ * @param p path to create
+ * @param data
+ */
 export async function tryCreate(
 	plugin: MarkdownExportPlugin,
-	path: string,
+	p: string,
 	data: string
 ) {
 	try {
-		if (path.startsWith("/")) {
-			fs.writeFileSync(path, data);
+		if (p.startsWith("/") || path.win32.isAbsolute(p)) {
+			fs.writeFileSync(p, data);
 		} else {
-			await plugin.app.vault.create(path, data);
+			await plugin.app.vault.create(p, data);
 		}
 	} catch (error) {
 		if (!error.message.contains("file already exists")) {
@@ -230,7 +243,10 @@ export async function tryCopyImage(
 
 					try {
 						if (!fileExists(targetPath)) {
-							if (plugin.settings.output.startsWith("/")) {
+							if (
+								plugin.settings.output.startsWith("/") ||
+								path.win32.isAbsolute(plugin.settings.output)
+							) {
 								const resourceOsPath = getResourceOsPath(
 									plugin,
 									ifile
@@ -333,7 +349,7 @@ export async function tryCopyMarkdownByRead(
 				const imageExt = path.extname(imageLink);
 				// Unify the link separator in obsidian as a forward slash instead of the default back slash in windows, so that the referenced images can be displayed properly
 
-				const clickSubRoute = getClickSubRoute(file.path);
+				const clickSubRoute = getClickSubRoute(outputSubPath);
 
 				const hashLink = path
 					.join(
