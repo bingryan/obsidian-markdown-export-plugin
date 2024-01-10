@@ -1,3 +1,16 @@
+# 1.0.16 (Wed Jan 10 2024)
+
+#### 🐛 Bug Fix
+
+- fix: windows absolute path export [#64](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/64) ([@bingryan](https://github.com/bingryan))
+- docs: update readme [#63](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/63) ([@bingryan](https://github.com/bingryan))
+
+#### Authors: 1
+
+- [@bingryan](https://github.com/bingryan)
+
+---
+
 # 1.0.15 (Wed Jan 10 2024)
 
 #### 🐛 Bug Fix
