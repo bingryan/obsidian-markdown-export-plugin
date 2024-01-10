@@ -1,3 +1,15 @@
+# 1.0.15 (Wed Jan 10 2024)
+
+#### 🐛 Bug Fix
+
+- fix: windows path router [#62](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/62) ([@bingryan](https://github.com/bingryan))
+
+#### Authors: 1
+
+- [@bingryan](https://github.com/bingryan)
+
+---
+
 # 1.0.14 (Sat Dec 30 2023)
 
 #### 🐛 Bug Fix
