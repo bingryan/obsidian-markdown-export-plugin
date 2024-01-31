@@ -1,3 +1,15 @@
+# 1.0.17 (Wed Jan 31 2024)
+
+#### 🐛 Bug Fix
+
+- refactor: rename manifest [#66](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/66) ([@bingryan](https://github.com/bingryan))
+
+#### Authors: 1
+
+- [@bingryan](https://github.com/bingryan)
+
+---
+
 # 1.0.16 (Wed Jan 10 2024)
 
 #### 🐛 Bug Fix
