@@ -1,5 +1,5 @@
 {
-  "name": "obsidian-markdown-export",
+  "name": "markdown-export",
   "version": "1.0.1",
   "description": "This plugin allows to markdown to a folder.",
   "main": "main.js",
