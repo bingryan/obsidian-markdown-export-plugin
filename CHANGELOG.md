@@ -1,3 +1,15 @@
+# 1.0.18 (Thu Feb 01 2024)
+
+#### 🐛 Bug Fix
+
+- fix: plugin id [#67](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/67) ([@bingryan](https://github.com/bingryan))
+
+#### Authors: 1
+
+- [@bingryan](https://github.com/bingryan)
+
+---
+
 # 1.0.17 (Wed Jan 31 2024)
 
 #### 🐛 Bug Fix
