@@ -11,10 +11,12 @@ export interface MarkdownExportPluginSettings {
 	output: string;
 	attachment: string;
 	GFM: boolean;
+	fileNameEncode: boolean;
 }
 
 export const DEFAULT_SETTINGS: MarkdownExportPluginSettings = {
 	output: "output",
 	attachment: "attachment",
 	GFM: true,
+	fileNameEncode: true,
 };
