@@ -162,5 +162,19 @@ class MarkdownExportSettingTab extends PluginSettingTab {
 						await this.plugin.saveSettings();
 					})
 			);
+
+		new Setting(containerEl)
+			.setName("Keep attchments file name")
+			.setDesc(
+				"Keep attchments file name"
+			)
+			.addToggle((toggle) =>
+				toggle
+					.setValue(this.plugin.settings.KeepOriginName)
+					.onChange(async (value: boolean) => {
+						this.plugin.settings.KeepOriginName = value;
+						await this.plugin.saveSettings();
+					})
+			);
 	}
 }
