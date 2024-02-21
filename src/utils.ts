@@ -216,7 +216,10 @@ export async function tryCopyImage(
 						imageLink = imageLink.split("|")[0];
 					}
 
-					const imageLinkMd5 = md5(imageLink);
+					const fileName = path.parse(path.basename(imageLink)).name;
+					const imageLinkMd5 = plugin.settings.fileNameEncode
+						? md5(imageLink)
+						: fileName;
 					const imageExt = path.extname(imageLink);
 					const ifile = plugin.app.metadataCache.getFirstLinkpathDest(
 						imageLink,
@@ -345,7 +348,10 @@ export async function tryCopyMarkdownByRead(
 				if (imageLink.contains("|")) {
 					imageLink = imageLink.split("|")[0];
 				}
-				const imageLinkMd5 = md5(imageLink);
+				const fileName = path.parse(path.basename(imageLink)).name;
+				const imageLinkMd5 = plugin.settings.fileNameEncode
+					? md5(imageLink)
+					: fileName;
 				const imageExt = path.extname(imageLink);
 				// Unify the link separator in obsidian as a forward slash instead of the default back slash in windows, so that the referenced images can be displayed properly
 
