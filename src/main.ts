@@ -162,7 +162,7 @@ class MarkdownExportSettingTab extends PluginSettingTab {
 		new Setting(containerEl)
 			.setName("Encode file name")
 			.setDesc(
-				"true default, if you want to keep the original file name, set this to false (if file name contains spaces, bug display for GFM.)."
+				"true default, if you want to keep the original file name, set this to false"
 			)
 			.addToggle((toggle) =>
 				toggle
