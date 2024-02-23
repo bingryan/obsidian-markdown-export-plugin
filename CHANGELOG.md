@@ -1,3 +1,18 @@
+# 1.0.20 (Fri Feb 23 2024)
+
+#### 🐛 Bug Fix
+
+- perf: bump version [#74](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/74) ([@bingryan](https://github.com/bingryan))
+- refactor: setting config [#73](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/73) ([@bingryan](https://github.com/bingryan))
+- feat: Add a option to keep attachment file name unchanged or use md5 of file name to rename(#68) [#72](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/72) ([@sxr1223](https://github.com/sxr1223))
+
+#### Authors: 2
+
+- [@bingryan](https://github.com/bingryan)
+- [@sxr1223](https://github.com/sxr1223)
+
+---
+
 # 1.0.19 (Thu Feb 22 2024)
 
 #### 🐛 Bug Fix
