@@ -351,7 +351,7 @@ export async function tryCopyMarkdownByRead(
 				const fileName = path.parse(path.basename(imageLink)).name;
 				const imageLinkMd5 = plugin.settings.fileNameEncode
 					? md5(imageLink)
-					: fileName;
+					: encodeURI(fileName);
 				const imageExt = path.extname(imageLink);
 				// Unify the link separator in obsidian as a forward slash instead of the default back slash in windows, so that the referenced images can be displayed properly
 
