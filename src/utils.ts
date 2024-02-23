@@ -219,7 +219,7 @@ export async function tryCopyImage(
 					const fileName = path.parse(path.basename(imageLink)).name;
 					const imageLinkMd5 = plugin.settings.fileNameEncode
 						? md5(imageLink)
-						: fileName;
+						: encodeURI(fileName);
 					const imageExt = path.extname(imageLink);
 					const ifile = plugin.app.metadataCache.getFirstLinkpathDest(
 						imageLink,
@@ -240,7 +240,7 @@ export async function tryCopyImage(
 						.join(
 							plugin.settings.output,
 							plugin.settings.attachment,
-							imageLinkMd5.concat(imageExt)
+							imageLinkMd5
 						)
 						.replace(/\\/g, "/");
 
@@ -348,6 +348,7 @@ export async function tryCopyMarkdownByRead(
 				if (imageLink.contains("|")) {
 					imageLink = imageLink.split("|")[0];
 				}
+
 				const fileName = path.parse(path.basename(imageLink)).name;
 				const imageLinkMd5 = plugin.settings.fileNameEncode
 					? md5(imageLink)
@@ -361,7 +362,7 @@ export async function tryCopyMarkdownByRead(
 					.join(
 						clickSubRoute,
 						plugin.settings.attachment,
-						imageLinkMd5.concat(imageExt)
+						imageLinkMd5
 					)
 					.replace(/\\/g, "/");
 
