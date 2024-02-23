@@ -10,10 +10,8 @@ import {
 } from "obsidian";
 import * as path from "path";
 
-
 import { MarkdownExportPluginSettings, DEFAULT_SETTINGS } from "./config";
 import { tryCreateFolder, tryRun } from "./utils";
-
 
 export default class MarkdownExportPlugin extends Plugin {
 	settings: MarkdownExportPluginSettings;
@@ -43,26 +41,24 @@ export default class MarkdownExportPlugin extends Plugin {
 			})
 		);
 
-		for (const outputFormat of ['markdown', 'HTML']) {
+		for (const outputFormat of ["markdown", "HTML"]) {
 			this.addCommand({
-				id: 'export-to-' + outputFormat,
+				id: "export-to-" + outputFormat,
 				name: `Export to ${outputFormat}`,
 				callback: async () => {
 					const file = this.app.workspace.getActiveFile();
 					if (!file) {
-						new Notice(
-							`No active file`
-						);
+						new Notice(`No active file`);
 						return;
 					}
 					this.createFolderAndRun(file, outputFormat);
-				}
+				},
 			});
 		}
 	}
 
 	registerDirMenu(menu: Menu, file: TAbstractFile) {
-		for (const outputFormat of ['markdown', 'HTML']) {
+		for (const outputFormat of ["markdown", "HTML"]) {
 			const addMenuItem = (item: MenuItem) => {
 				item.setTitle(`Export to ${outputFormat}`);
 				item.onClick(async () => {
@@ -72,14 +68,14 @@ export default class MarkdownExportPlugin extends Plugin {
 			menu.addItem(addMenuItem);
 		}
 	}
-	private async createFolderAndRun(file: TAbstractFile, outputFormat: string) {
+	private async createFolderAndRun(
+		file: TAbstractFile,
+		outputFormat: string
+	) {
 		// try create attachment directory
 		await tryCreateFolder(
 			this,
-			path.join(
-				this.settings.output,
-				this.settings.attachment
-			)
+			path.join(this.settings.output, this.settings.attachment)
 		);
 
 		// run
@@ -93,7 +89,7 @@ export default class MarkdownExportPlugin extends Plugin {
 		);
 	}
 
-	onunload() { }
+	onunload() {}
 
 	async loadSettings() {
 		this.settings = Object.assign(
@@ -164,15 +160,15 @@ class MarkdownExportSettingTab extends PluginSettingTab {
 			);
 
 		new Setting(containerEl)
-			.setName("Keep attchments file name")
+			.setName("Encode file name")
 			.setDesc(
-				"Keep attchments file name"
+				"true default, if you want to keep the original file name, set this to false (if file name contains spaces, bug display for GFM.)."
 			)
 			.addToggle((toggle) =>
 				toggle
-					.setValue(this.plugin.settings.KeepOriginName)
+					.setValue(this.plugin.settings.fileNameEncode)
 					.onChange(async (value: boolean) => {
-						this.plugin.settings.KeepOriginName = value;
+						this.plugin.settings.fileNameEncode = value;
 						await this.plugin.saveSettings();
 					})
 			);

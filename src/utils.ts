@@ -216,16 +216,11 @@ export async function tryCopyImage(
 						imageLink = imageLink.split("|")[0];
 					}
 
-					var imageLinkMd5;
-					if (plugin.settings.KeepOriginName){
-						imageLinkMd5 = imageLink.split("/")[1];
-					} else {
-						const imageExt = path.extname(imageLink);
-						imageLinkMd5 = md5(imageLink).concat(imageExt);
-					}
-					
-					console.log(imageLink);
-					
+					const fileName = path.parse(path.basename(imageLink)).name;
+					const imageLinkMd5 = plugin.settings.fileNameEncode
+						? md5(imageLink)
+						: encodeURI(fileName);
+					const imageExt = path.extname(imageLink);
 					const ifile = plugin.app.metadataCache.getFirstLinkpathDest(
 						imageLink,
 						contentPath
@@ -354,13 +349,11 @@ export async function tryCopyMarkdownByRead(
 					imageLink = imageLink.split("|")[0];
 				}
 
-				var imageLinkMd5;
-				if (plugin.settings.KeepOriginName){
-					imageLinkMd5 = encodeURI(imageLink.split("/")[1]);
-				} else {
-					const imageExt = path.extname(imageLink);
-					imageLinkMd5 = md5(imageLink).concat(imageExt);
-				}
+				const fileName = path.parse(path.basename(imageLink)).name;
+				const imageLinkMd5 = plugin.settings.fileNameEncode
+					? md5(imageLink)
+					: fileName;
+				const imageExt = path.extname(imageLink);
 				// Unify the link separator in obsidian as a forward slash instead of the default back slash in windows, so that the referenced images can be displayed properly
 
 				const clickSubRoute = getClickSubRoute(outputSubPath);
