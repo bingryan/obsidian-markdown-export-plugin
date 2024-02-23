@@ -1,3 +1,16 @@
+# 1.0.19 (Thu Feb 22 2024)
+
+#### 🐛 Bug Fix
+
+- release: 1.0.18 [#70](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/70) ([@bingryan](https://github.com/bingryan))
+- feat: add fileNameEncode option [#69](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/69) ([@bingryan](https://github.com/bingryan))
+
+#### Authors: 1
+
+- [@bingryan](https://github.com/bingryan)
+
+---
+
 # 1.0.18 (Thu Feb 01 2024)
 
 #### 🐛 Bug Fix
