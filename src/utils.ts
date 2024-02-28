@@ -379,6 +379,11 @@ export async function tryCopyMarkdownByRead(
 					content = content.replace(urlEncodedImageLink, hashLink);
 				}
 			}
+			// Regex Replace
+      		if (plugin.settings.RegExString) {
+        		var NewRegExp= new RegExp(plugin.settings.RegExString,'g');
+        		content = content.replace(NewRegExp, plugin.settings.ReplacmentString);
+      		}
 			const cfile = plugin.app.workspace.getActiveFile();
 			if (cfile != undefined) {
 				const embedMap = await getEmbedMap(plugin, content, cfile.path);

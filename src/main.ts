@@ -172,5 +172,32 @@ class MarkdownExportSettingTab extends PluginSettingTab {
 						await this.plugin.saveSettings();
 					})
 			);
+
+    	//Regex Replace
+    	new Setting(containerEl)
+    		.setName("Regex expression")
+    		.setDesc("Regex expression to use for replacement")
+    		.addText((text) => 
+    			text
+    				.setPlaceholder("")
+    				.setValue(this.plugin.settings.RegExString)
+    				.onChange(async (value) => {
+      					this.plugin.settings.RegExString = value;
+      					await this.plugin.saveSettings();
+    				})
+    		);
+    
+    	new Setting(containerEl)
+    		.setName("Replacement string")
+    		.setDesc("String which will be used if regex expression is matching")
+    		.addText((text) => 
+    			text
+    				.setPlaceholder("")
+    				.setValue(this.plugin.settings.ReplacmentString)
+    				.onChange(async (value) => {
+      					this.plugin.settings.ReplacmentString = value;
+      				await this.plugin.saveSettings();
+    			})
+    		);
 	}
 }
