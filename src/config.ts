@@ -21,4 +21,6 @@ export const DEFAULT_SETTINGS: MarkdownExportPluginSettings = {
 	attachment: "attachment",
 	GFM: true,
 	fileNameEncode: true,
+  RegExString:"",
+  ReplacmentString:""
 };
