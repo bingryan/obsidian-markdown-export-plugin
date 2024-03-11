@@ -173,7 +173,7 @@ class MarkdownExportSettingTab extends PluginSettingTab {
 					})
 			);
 
-		//Regex Replace
+		//Regex Replace new parameter
 		new Setting(containerEl)
 			.setName("Regex expression")
 			.setDesc("Regex expression to use for replacement")
