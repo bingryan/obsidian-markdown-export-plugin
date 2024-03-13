@@ -380,9 +380,13 @@ export async function tryCopyMarkdownByRead(
 				}
 			}
 			// Regex Replace
-			if (plugin.settings.RegExString) {
-				let NewRegExp= new RegExp(plugin.settings.RegExString,'g');
-				content = content.replace(NewRegExp, plugin.settings.ReplacmentString);
+			let RegexArrayLenght=plugin.settings.RegExString.length;
+
+			for (let i = 0; i < RegexArrayLenght; i++) {
+				if (plugin.settings.RegExString[i]) {
+					let NewRegExp= new RegExp(plugin.settings.RegExString[i],'g');
+					content = content.replace(NewRegExp, plugin.settings.ReplacmentString[i]);
+				}
 			}
 			const cfile = plugin.app.workspace.getActiveFile();
 			if (cfile != undefined) {

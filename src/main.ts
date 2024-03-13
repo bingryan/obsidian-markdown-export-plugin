@@ -1,5 +1,6 @@
 import {
 	App,
+	ButtonComponent,
 	Menu,
 	MenuItem,
 	Notice,
@@ -7,11 +8,13 @@ import {
 	PluginSettingTab,
 	Setting,
 	TAbstractFile,
+	renderResults,
 } from "obsidian";
 import * as path from "path";
 
 import { MarkdownExportPluginSettings, DEFAULT_SETTINGS } from "./config";
 import { tryCreateFolder, tryRun } from "./utils";
+import { debug } from "console";
 
 export default class MarkdownExportPlugin extends Plugin {
 	settings: MarkdownExportPluginSettings;
@@ -172,32 +175,93 @@ class MarkdownExportSettingTab extends PluginSettingTab {
 						await this.plugin.saveSettings();
 					})
 			);
-
-		//Regex Replace new parameter
+		
+		// Create a Button to add new regex+replacements container
 		new Setting(containerEl)
-			.setName("Regex expression")
-			.setDesc("Regex expression to use for replacement")
-			.addText((text) =>
-				text
-					.setPlaceholder("")
-					.setValue(this.plugin.settings.RegExString)
-					.onChange(async (value) => {
-						this.plugin.settings.RegExString = value;
-						await this.plugin.saveSettings();
-					})
+		.setName("Add regex")
+		.setDesc("Create a new regex/replace combination")
+		.addButton((Button)=>
+			Button
+				.setIcon("plus")
+				.onClick(() => {
+					//Get the lenght of the regex array to be able to assign the input to the last element
+					let NextRegexString=this.plugin.settings.RegExString.length;
+					// Add an additional empty array element after button click
+					this.plugin.settings.RegExString.push("");
+					//Get the lenght of the replacement array to be able to assign the input to the last element
+					let NextReplacmentString=this.plugin.settings.ReplacmentString.length;
+					// Add an additional empty array element after button click
+					this.plugin.settings.ReplacmentString.push("");
+					
+					// create two input fields + a trash button, number them and assign them to the correct array element
+					new Setting(containerEl)
+					.setClass("Regex"+String(NextRegexString+1))
+					.setName("Regex "+String(NextRegexString+1))
+					.setDesc("Regex and replacement")
+					.addText((text) =>{
+						text
+							.setPlaceholder("Regex String")
+							.setValue(this.plugin.settings.RegExString[NextRegexString])
+							.onChange(async (value) => {
+								this.plugin.settings.RegExString[NextRegexString] = value;
+								await this.plugin.saveSettings();
+							})
+						})
+					.addText((text) =>{
+						text
+							.setPlaceholder("Replacement String")
+							.setValue(this.plugin.settings.ReplacmentString[NextReplacmentString])
+							.onChange(async (value) => {
+								this.plugin.settings.ReplacmentString[NextReplacmentString] = value;
+								await this.plugin.saveSettings();
+							})
+						})
+					//Create a trash Button - just the icon is needed
+					.addExtraButton((Button)=>{
+						Button
+							.setIcon("trash")
+					});
+				})
 			);
-
+		
+		// get the length of the regex arrray
+		let RegexArrayLenght=this.plugin.settings.RegExString.length;
+		// Build all regex+replacemten container which have been filled and are saved
+		for (let i = 0; i < RegexArrayLenght; i++) {
 		new Setting(containerEl)
-			.setName("Replacement string")
-			.setDesc("String which will be used if regex expression is matching")
-			.addText((text) =>
-				text
-					.setPlaceholder("")
-					.setValue(this.plugin.settings.ReplacmentString)
-					.onChange(async (value) => {
-						this.plugin.settings.ReplacmentString = value;
-						await this.plugin.saveSettings();
-					})
-			);
+		.setClass("Regex"+String(i+1))
+		.setName("Regex "+String(i+1))
+		.setDesc("Regex and replacement")
+		.addText((text) =>{
+			text
+				.setPlaceholder("Regex String")
+				.setValue(this.plugin.settings.RegExString[i])
+				.onChange(async (value) => {
+					this.plugin.settings.RegExString[i] = value;
+					await this.plugin.saveSettings();
+				})
+			})
+		.addText((text) =>{
+			text
+				.setPlaceholder("Replacement String")
+				.setValue(this.plugin.settings.ReplacmentString[i])
+				.onChange(async (value) => {
+					this.plugin.settings.ReplacmentString[i] = value;
+					await this.plugin.saveSettings();
+				})
+			})
+		//new Setting(containerEl)
+		.addExtraButton((Button)=>{
+			Button
+				.setIcon("trash")
+				.onClick(async ()=>{
+					//remove array elements after trash button is pressed and refresh setting window
+					this.plugin.settings.RegExString.splice(i,1);
+					this.plugin.settings.ReplacmentString.splice(i,1);
+					await this.plugin.saveSettings();
+					this.display();
+				});
+		});
+		}
 	}
 }
