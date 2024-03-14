@@ -379,6 +379,15 @@ export async function tryCopyMarkdownByRead(
 					content = content.replace(urlEncodedImageLink, hashLink);
 				}
 			}
+			// Regex Replace
+			const RegexArrayLenght=plugin.settings.RegExString.length;
+
+			for (let i = 0; i < RegexArrayLenght; i++) {
+				if (plugin.settings.RegExString[i]) {
+					const NewRegExp= new RegExp(plugin.settings.RegExString[i],'g');
+					content = content.replace(NewRegExp, plugin.settings.ReplacmentString[i]);
+				}
+			}
 			const cfile = plugin.app.workspace.getActiveFile();
 			if (cfile != undefined) {
 				const embedMap = await getEmbedMap(plugin, content, cfile.path);
