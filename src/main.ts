@@ -217,6 +217,13 @@ class MarkdownExportSettingTab extends PluginSettingTab {
 					.addExtraButton((Button)=>{
 						Button
 							.setIcon("trash")
+							.onClick(async ()=>{
+								//remove array elements after trash button is pressed and refresh setting window
+								this.plugin.settings.RegExString.splice(NextRegexString,1);
+								this.plugin.settings.ReplacmentString.splice(NextReplacmentString,1);
+								await this.plugin.saveSettings();
+								this.display();
+							})
 					});
 				})
 			);
