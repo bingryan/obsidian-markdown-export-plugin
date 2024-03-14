@@ -1,6 +1,5 @@
 import {
 	App,
-	ButtonComponent,
 	Menu,
 	MenuItem,
 	Notice,
@@ -8,13 +7,11 @@ import {
 	PluginSettingTab,
 	Setting,
 	TAbstractFile,
-	renderResults,
 } from "obsidian";
 import * as path from "path";
 
 import { MarkdownExportPluginSettings, DEFAULT_SETTINGS } from "./config";
 import { tryCreateFolder, tryRun } from "./utils";
-import { debug } from "console";
 
 export default class MarkdownExportPlugin extends Plugin {
 	settings: MarkdownExportPluginSettings;
@@ -185,11 +182,11 @@ class MarkdownExportSettingTab extends PluginSettingTab {
 				.setIcon("plus")
 				.onClick(() => {
 					//Get the lenght of the regex array to be able to assign the input to the last element
-					let NextRegexString=this.plugin.settings.RegExString.length;
+					const NextRegexString=this.plugin.settings.RegExString.length;
 					// Add an additional empty array element after button click
 					this.plugin.settings.RegExString.push("");
 					//Get the lenght of the replacement array to be able to assign the input to the last element
-					let NextReplacmentString=this.plugin.settings.ReplacmentString.length;
+					const NextReplacmentString=this.plugin.settings.ReplacmentString.length;
 					// Add an additional empty array element after button click
 					this.plugin.settings.ReplacmentString.push("");
 					
@@ -225,7 +222,7 @@ class MarkdownExportSettingTab extends PluginSettingTab {
 			);
 		
 		// get the length of the regex arrray
-		let RegexArrayLenght=this.plugin.settings.RegExString.length;
+		const RegexArrayLenght=this.plugin.settings.RegExString.length;
 		// Build all regex+replacemten container which have been filled and are saved
 		for (let i = 0; i < RegexArrayLenght; i++) {
 		new Setting(containerEl)
