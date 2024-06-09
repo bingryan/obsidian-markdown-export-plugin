@@ -38,7 +38,7 @@ export default class MarkdownExportPlugin extends Plugin {
 				// 	}
 				// 	menu.addItem(addFileMenuItem);
 				// }
-			})
+			}),
 		);
 
 		for (const outputFormat of ["markdown", "HTML"]) {
@@ -70,12 +70,12 @@ export default class MarkdownExportPlugin extends Plugin {
 	}
 	private async createFolderAndRun(
 		file: TAbstractFile,
-		outputFormat: string
+		outputFormat: string,
 	) {
 		// try create attachment directory
 		await tryCreateFolder(
 			this,
-			path.join(this.settings.output, this.settings.attachment)
+			path.join(this.settings.output, this.settings.attachment),
 		);
 
 		// run
@@ -84,18 +84,18 @@ export default class MarkdownExportPlugin extends Plugin {
 		new Notice(
 			`Exporting ${file.path} to ${path.join(
 				this.settings.output,
-				file.name
-			)}`
+				file.name,
+			)}`,
 		);
 	}
 
-	onunload() { }
+	onunload() {}
 
 	async loadSettings() {
 		this.settings = Object.assign(
 			{},
 			DEFAULT_SETTINGS,
-			await this.loadData()
+			await this.loadData(),
 		);
 	}
 
@@ -129,7 +129,7 @@ class MarkdownExportSettingTab extends PluginSettingTab {
 					.onChange(async (value) => {
 						this.plugin.settings.output = value;
 						await this.plugin.saveSettings();
-					})
+					}),
 			);
 
 		new Setting(containerEl)
@@ -142,13 +142,13 @@ class MarkdownExportSettingTab extends PluginSettingTab {
 					.onChange(async (value) => {
 						this.plugin.settings.attachment = value;
 						await this.plugin.saveSettings();
-					})
+					}),
 			);
 
 		new Setting(containerEl)
 			.setName("Use GitHub Flavored Markdown Format")
 			.setDesc(
-				"The format of markdown is more inclined to choose Github Flavored Markdown"
+				"The format of markdown is more inclined to choose Github Flavored Markdown",
 			)
 			.addToggle((toggle) =>
 				toggle
@@ -156,13 +156,27 @@ class MarkdownExportSettingTab extends PluginSettingTab {
 					.onChange(async (value: boolean) => {
 						this.plugin.settings.GFM = value;
 						await this.plugin.saveSettings();
-					})
+					}),
+			);
+
+		new Setting(containerEl)
+			.setName("Use Html tag <img /> to display image")
+			.setDesc(
+				"true default, <img /> tag will use the size specified in obsidian.",
+			)
+			.addToggle((toggle) =>
+				toggle
+					.setValue(this.plugin.settings.displayImageAsHtml)
+					.onChange(async (value: boolean) => {
+						this.plugin.settings.displayImageAsHtml = value;
+						await this.plugin.saveSettings();
+					}),
 			);
 
 		new Setting(containerEl)
 			.setName("Encode file name")
 			.setDesc(
-				"true default, if you want to keep the original file name, set this to false"
+				"true default, if you want to keep the original file name, set this to false",
 			)
 			.addToggle((toggle) =>
 				toggle
@@ -170,7 +184,21 @@ class MarkdownExportSettingTab extends PluginSettingTab {
 					.onChange(async (value: boolean) => {
 						this.plugin.settings.fileNameEncode = value;
 						await this.plugin.saveSettings();
-					})
+					}),
+			);
+
+		new Setting(containerEl)
+			.setName("Remove brackets for outgoing links")
+			.setDesc(
+				"true default, if you want to keep the brackets in links, set this to false",
+			)
+			.addToggle((toggle) =>
+				toggle
+					.setValue(this.plugin.settings.removeOutgoingLinkBrackets)
+					.onChange(async (value: boolean) => {
+						this.plugin.settings.removeOutgoingLinkBrackets = value;
+						await this.plugin.saveSettings();
+					}),
 			);
 	}
 }
