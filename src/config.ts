@@ -7,7 +7,7 @@ export const EMBED_URL_REGEXP = /!\[\[(.*?)\]\]/g;
 
 export const GFM_IMAGE_FORMAT = "![]({0})";
 
-export const OUTGOING_LINK_REGEXP = /[^!]\[\[(.*?)\]\]/g;
+export const OUTGOING_LINK_REGEXP = /(?<!!)\[\[(.*?)\]\]/g;
 
 export interface MarkdownExportPluginSettings {
 	output: string;
