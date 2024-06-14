@@ -8,6 +8,7 @@ import {
 	MARKDOWN_ATTACHMENT_URL_REGEXP,
 	EMBED_URL_REGEXP,
 	GFM_IMAGE_FORMAT,
+	OUTGOING_LINK_REGEXP,
 } from "./config";
 import MarkdownExportPlugin from "./main";
 import markdownToHTML from "./renderer";
@@ -21,7 +22,7 @@ type CopyMarkdownOptions = {
 export async function getImageLinks(markdown: string) {
 	const imageLinks = markdown.matchAll(ATTACHMENT_URL_REGEXP);
 	const markdownImageLinks = markdown.matchAll(
-		MARKDOWN_ATTACHMENT_URL_REGEXP
+		MARKDOWN_ATTACHMENT_URL_REGEXP,
 	);
 	return Array.from(imageLinks).concat(Array.from(markdownImageLinks));
 }
@@ -37,7 +38,7 @@ export function allMarkdownParams(
 	out: Array<CopyMarkdownOptions>,
 	outputFormat = "markdown",
 	outputSubPath = ".",
-	parentPath = ""
+	parentPath = "",
 ): Array<CopyMarkdownOptions> {
 	try {
 		//  dir
@@ -53,7 +54,7 @@ export function allMarkdownParams(
 						out,
 						outputFormat,
 						outputSubPath,
-						outputSubPath
+						outputSubPath,
 					);
 				} else {
 					out.push({
@@ -79,7 +80,7 @@ export function allMarkdownParams(
 export async function tryRun(
 	plugin: MarkdownExportPlugin,
 	file: TAbstractFile,
-	outputFormat = "markdown"
+	outputFormat = "markdown",
 ) {
 	// recursive functions are not suitable for this case
 	// if ((<TFile>file).extension) {
@@ -106,7 +107,7 @@ export async function tryRun(
 
 export function getResourceOsPath(
 	plugin: MarkdownExportPlugin,
-	resouorce: TFile | null
+	resouorce: TFile | null,
 ): string {
 	if (resouorce === null) {
 		return ".";
@@ -179,7 +180,7 @@ export async function tryCreateFolder(plugin: MarkdownExportPlugin, p: string) {
 export async function tryCreate(
 	plugin: MarkdownExportPlugin,
 	p: string,
-	data: string
+	data: string,
 ) {
 	try {
 		if (p.startsWith("/") || path.win32.isAbsolute(p)) {
@@ -196,7 +197,7 @@ export async function tryCreate(
 
 export async function tryCopyImage(
 	plugin: MarkdownExportPlugin,
-	contentPath: string
+	contentPath: string,
 ) {
 	try {
 		await plugin.app.vault.adapter
@@ -210,7 +211,7 @@ export async function tryCopyImage(
 					// decode and replace the relative path
 					let imageLink = decodeURI(urlEncodedImageLink).replace(
 						/\.\.\//g,
-						""
+						"",
 					);
 					if (imageLink.contains("|")) {
 						imageLink = imageLink.split("|")[0];
@@ -223,7 +224,7 @@ export async function tryCopyImage(
 					const imageExt = path.extname(imageLink);
 					const ifile = plugin.app.metadataCache.getFirstLinkpathDest(
 						imageLink,
-						contentPath
+						contentPath,
 					);
 
 					const filePath =
@@ -240,7 +241,7 @@ export async function tryCopyImage(
 						.join(
 							plugin.settings.output,
 							plugin.settings.attachment,
-							imageLinkMd5.concat(imageExt)
+							imageLinkMd5.concat(imageExt),
 						)
 						.replace(/\\/g, "/");
 
@@ -252,19 +253,19 @@ export async function tryCopyImage(
 							) {
 								const resourceOsPath = getResourceOsPath(
 									plugin,
-									ifile
+									ifile,
 								);
 								fs.copyFileSync(resourceOsPath, targetPath);
 							} else {
 								await plugin.app.vault.adapter.copy(
 									filePath,
-									targetPath
+									targetPath,
 								);
 							}
 						}
 					} catch (error) {
 						console.error(
-							`Failed to copy file from ${filePath} to ${targetPath}: ${error.message}`
+							`Failed to copy file from ${filePath} to ${targetPath}: ${error.message}`,
 						);
 					}
 				}
@@ -279,12 +280,12 @@ export async function tryCopyImage(
 export async function tryCopyMarkdown(
 	plugin: MarkdownExportPlugin,
 	contentPath: string,
-	contentName: string
+	contentName: string,
 ) {
 	try {
 		await plugin.app.vault.adapter.copy(
 			contentPath,
-			path.join(plugin.settings.output, contentName)
+			path.join(plugin.settings.output, contentName),
 		);
 	} catch (error) {
 		if (!error.message.contains("file already exists")) {
@@ -296,19 +297,19 @@ export async function tryCopyMarkdown(
 export async function getEmbedMap(
 	plugin: MarkdownExportPlugin,
 	content: string,
-	path: string
+	path: string,
 ) {
 	// key：link url
 	// value： embed content parse from html document
 	const embedMap = new Map();
 	const embedList = Array.from(
-		document.documentElement.getElementsByClassName("internal-embed")
+		document.documentElement.getElementsByClassName("internal-embed"),
 	);
 
 	Array.from(embedList).forEach((el) => {
 		// markdown-embed-content markdown-embed-page
 		const embedContentHtml = el.getElementsByClassName(
-			"markdown-embed-content"
+			"markdown-embed-content",
 		)[0];
 
 		if (embedContentHtml) {
@@ -328,20 +329,26 @@ export async function getEmbedMap(
 
 export async function tryCopyMarkdownByRead(
 	plugin: MarkdownExportPlugin,
-	{ file, outputFormat, outputSubPath = "." }: CopyMarkdownOptions
+	{ file, outputFormat, outputSubPath = "." }: CopyMarkdownOptions,
 ) {
 	try {
 		await plugin.app.vault.adapter.read(file.path).then(async (content) => {
 			const imageLinks = await getImageLinks(content);
 			for (const index in imageLinks) {
 				const rawImageLink = imageLinks[index][0];
+
+				const { width, height } = imageLinks[index].groups as {
+					width: string | null;
+					height: string | null;
+				};
+
 				const urlEncodedImageLink =
 					imageLinks[index][7 - imageLinks[index].length];
 
 				// decode and replace the relative path
 				let imageLink = decodeURI(urlEncodedImageLink).replace(
 					/\.\.\//g,
-					""
+					"",
 				);
 				// link: https://help.obsidian.md/Linking+notes+and+files/Embedding+files#Embed+an+image+in+a+note
 				// issue: #44 -> figure checkout: ![[name|figure]]
@@ -361,7 +368,7 @@ export async function tryCopyMarkdownByRead(
 					.join(
 						clickSubRoute,
 						plugin.settings.attachment,
-						imageLinkMd5.concat(imageExt)
+						imageLinkMd5.concat(imageExt),
 					)
 					.replace(/\\/g, "/");
 
@@ -370,15 +377,34 @@ export async function tryCopyMarkdownByRead(
 					continue;
 				}
 
-				if (plugin.settings.GFM) {
+				if (plugin.settings.displayImageAsHtml) {
+					const style =
+						width && height
+							? ` style='width: {${width}}px; height: ${height}px;'`
+							: width
+								? ` style='width: ${width}px;'`
+								: height
+									? ` style='height: ${height}px;'`
+									: "";
+
 					content = content.replace(
 						rawImageLink,
-						GFM_IMAGE_FORMAT.format(hashLink)
+						`<img src="${hashLink}"${style} />`,
+					);
+				} else if (plugin.settings.GFM) {
+					content = content.replace(
+						rawImageLink,
+						GFM_IMAGE_FORMAT.format(hashLink),
 					);
 				} else {
 					content = content.replace(urlEncodedImageLink, hashLink);
 				}
 			}
+
+			if (plugin.settings.removeOutgoingLinkBrackets) {
+				content = content.replaceAll(OUTGOING_LINK_REGEXP, "$1");
+			}
+
 			const cfile = plugin.app.workspace.getActiveFile();
 			if (cfile != undefined) {
 				const embedMap = await getEmbedMap(plugin, content, cfile.path);
@@ -387,7 +413,7 @@ export async function tryCopyMarkdownByRead(
 					const url = embeds[index][1];
 					content = content.replace(
 						embeds[index][0],
-						embedMap.get(url)
+						embedMap.get(url),
 					);
 				}
 			}
@@ -401,12 +427,12 @@ export async function tryCopyMarkdownByRead(
 				case "HTML": {
 					const targetFile = path.join(
 						outDir,
-						file.name.replace(".md", ".html")
+						file.name.replace(".md", ".html"),
 					);
 					const { html } = await markdownToHTML(
 						plugin,
 						file.path,
-						content
+						content,
 					);
 					await tryCreate(plugin, targetFile, html);
 					break;
