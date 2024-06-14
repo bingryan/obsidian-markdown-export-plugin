@@ -1,3 +1,15 @@
+# 1.0.21 (Fri Jun 14 2024)
+
+#### 🐛 Bug Fix
+
+- feat: add displayImageAsHtml and removeOutgoingLinkBrackets options [#83](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/83) ([@bruce3x](https://github.com/bruce3x))
+
+#### Authors: 1
+
+- bruce3x ([@bruce3x](https://github.com/bruce3x))
+
+---
+
 # 1.0.20 (Fri Feb 23 2024)
 
 #### 🐛 Bug Fix
