@@ -197,6 +197,7 @@ export async function tryCreate(
 
 export async function tryCopyImage(
 	plugin: MarkdownExportPlugin,
+	filename: string,
 	contentPath: string,
 ) {
 	try {
@@ -237,9 +238,15 @@ export async function tryCopyImage(
 						continue;
 					}
 
+					var dir = ""
+					if (plugin.settings.includeFileName == true) {
+						dir = filename.replace(".md", "")
+					}
+
 					const targetPath = path
 						.join(
 							plugin.settings.output,
+							dir,
 							plugin.settings.attachment,
 							imageLinkMd5.concat(imageExt),
 						)
@@ -418,16 +425,28 @@ export async function tryCopyMarkdownByRead(
 				}
 			}
 
-			await tryCopyImage(plugin, file.path);
+			var dir = ""
+			if (plugin.settings.includeFileName == true) {
+				dir = file.name.replace(".md", "")
+			}
 
-			const outDir = path.join(plugin.settings.output, outputSubPath);
+			await tryCopyImage(plugin, file.name, file.path);
+
+			const outDir = path.join(plugin.settings.output, dir, outputSubPath);
+
 			await tryCreateFolder(plugin, outDir);
 
 			switch (outputFormat) {
 				case "HTML": {
+					var filename
+					if (plugin.settings.customFileName) {
+						filename = plugin.settings.customFileName + ".md"
+					} else {
+						filename = file.name
+					}
 					const targetFile = path.join(
 						outDir,
-						file.name.replace(".md", ".html"),
+						filename.replace(".md", ".html"),
 					);
 					const { html } = await markdownToHTML(
 						plugin,
@@ -438,7 +457,13 @@ export async function tryCopyMarkdownByRead(
 					break;
 				}
 				case "markdown": {
-					const targetFile = path.join(outDir, file.name);
+					var filename
+					if (plugin.settings.customFileName) {
+						filename = plugin.settings.customFileName + ".md"
+					} else {
+						filename = file.name
+					}
+					const targetFile = path.join(outDir, filename);
 					await tryCreate(plugin, targetFile, content);
 					break;
 				}
