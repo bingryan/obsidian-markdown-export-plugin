@@ -21,8 +21,8 @@ export interface MarkdownExportPluginSettings {
 export const DEFAULT_SETTINGS: MarkdownExportPluginSettings = {
 	output: "output",
 	attachment: "attachment",
-	displayImageAsHtml: true,
+	displayImageAsHtml: false,
 	GFM: true,
 	fileNameEncode: true,
-	removeOutgoingLinkBrackets: true,
+	removeOutgoingLinkBrackets: false,
 };

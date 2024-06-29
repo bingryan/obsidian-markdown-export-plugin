@@ -162,7 +162,7 @@ class MarkdownExportSettingTab extends PluginSettingTab {
 		new Setting(containerEl)
 			.setName("Use Html tag <img /> to display image")
 			.setDesc(
-				"true default, <img /> tag will use the size specified in obsidian.",
+				"false default, <img /> tag will use the size specified in obsidian.",
 			)
 			.addToggle((toggle) =>
 				toggle
@@ -190,7 +190,7 @@ class MarkdownExportSettingTab extends PluginSettingTab {
 		new Setting(containerEl)
 			.setName("Remove brackets for outgoing links")
 			.setDesc(
-				"true default, if you want to keep the brackets in links, set this to false",
+				"false default, if you want to remove the brackets in links, set this to true",
 			)
 			.addToggle((toggle) =>
 				toggle
