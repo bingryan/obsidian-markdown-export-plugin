@@ -1,3 +1,16 @@
+# 1.0.22 (Sat Jun 29 2024)
+
+#### 🐛 Bug Fix
+
+- fix: default config value [#88](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/88) ([@bingryan](https://github.com/bingryan))
+- docs: update readme [#87](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/87) ([@bingryan](https://github.com/bingryan))
+
+#### Authors: 1
+
+- [@bingryan](https://github.com/bingryan)
+
+---
+
 # 1.0.21 (Fri Jun 14 2024)
 
 #### 🐛 Bug Fix
