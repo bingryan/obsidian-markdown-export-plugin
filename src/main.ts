@@ -73,7 +73,7 @@ export default class MarkdownExportPlugin extends Plugin {
 		outputFormat: string,
 	) {
 
-		var dir = ""
+		let dir = ""
 		if (this.settings.includeFileName == true) {
 			dir = file.name.replace(".md", "")
 		}

@@ -238,7 +238,7 @@ export async function tryCopyImage(
 						continue;
 					}
 
-					var dir = ""
+					let dir = ""
 					if (plugin.settings.includeFileName == true) {
 						dir = filename.replace(".md", "")
 					}
@@ -425,7 +425,7 @@ export async function tryCopyMarkdownByRead(
 				}
 			}
 
-			var dir = ""
+			let dir = ""
 			if (plugin.settings.includeFileName == true) {
 				dir = file.name.replace(".md", "")
 			}
@@ -438,7 +438,7 @@ export async function tryCopyMarkdownByRead(
 
 			switch (outputFormat) {
 				case "HTML": {
-					var filename
+					let filename
 					if (plugin.settings.customFileName) {
 						filename = plugin.settings.customFileName + ".md"
 					} else {
@@ -457,7 +457,7 @@ export async function tryCopyMarkdownByRead(
 					break;
 				}
 				case "markdown": {
-					var filename
+					let filename
 					if (plugin.settings.customFileName) {
 						filename = plugin.settings.customFileName + ".md"
 					} else {
