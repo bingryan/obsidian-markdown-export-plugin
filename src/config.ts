@@ -16,6 +16,8 @@ export interface MarkdownExportPluginSettings {
 	GFM: boolean;
 	fileNameEncode: boolean;
 	removeOutgoingLinkBrackets: boolean;
+	includeFileName: boolean;
+	customFileName: string;
 }
 
 export const DEFAULT_SETTINGS: MarkdownExportPluginSettings = {
@@ -25,4 +27,6 @@ export const DEFAULT_SETTINGS: MarkdownExportPluginSettings = {
 	GFM: true,
 	fileNameEncode: true,
 	removeOutgoingLinkBrackets: false,
+	includeFileName: false,
+	customFileName: "",
 };

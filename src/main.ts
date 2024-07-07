@@ -72,10 +72,16 @@ export default class MarkdownExportPlugin extends Plugin {
 		file: TAbstractFile,
 		outputFormat: string,
 	) {
+
+		let dir = ""
+		if (this.settings.includeFileName == true) {
+			dir = file.name.replace(".md", "")
+		}
+
 		// try create attachment directory
 		await tryCreateFolder(
 			this,
-			path.join(this.settings.output, this.settings.attachment),
+			path.join(this.settings.output, dir, this.settings.attachment),
 		);
 
 		// run
@@ -84,6 +90,7 @@ export default class MarkdownExportPlugin extends Plugin {
 		new Notice(
 			`Exporting ${file.path} to ${path.join(
 				this.settings.output,
+				dir,
 				file.name,
 			)}`,
 		);
@@ -197,6 +204,32 @@ class MarkdownExportSettingTab extends PluginSettingTab {
 					.setValue(this.plugin.settings.removeOutgoingLinkBrackets)
 					.onChange(async (value: boolean) => {
 						this.plugin.settings.removeOutgoingLinkBrackets = value;
+						await this.plugin.saveSettings();
+					}),
+			);
+
+		new Setting(containerEl)
+			.setName("Include filename in output path")
+			.setDesc(
+				"false default, if you want to include the filename (without extension) in the output path set this to true",
+			)
+			.addToggle((toggle) =>
+				toggle
+					.setValue(this.plugin.settings.includeFileName)
+					.onChange(async (value: boolean) => {
+						this.plugin.settings.includeFileName = value;
+						await this.plugin.saveSettings();
+					}),
+			);
+		new Setting(containerEl)
+			.setName("Custom filename")
+			.setDesc("update if you want a custom filename, leave off extension")
+			.addText((text) =>
+				text
+					.setPlaceholder("Enter custom filename")
+					.setValue(this.plugin.settings.customFileName)
+					.onChange(async (value) => {
+						this.plugin.settings.customFileName = value;
 						await this.plugin.saveSettings();
 					}),
 			);
