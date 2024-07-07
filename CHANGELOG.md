@@ -1,3 +1,15 @@
+# 1.0.23 (Sun Jul 07 2024)
+
+#### 🐛 Bug Fix
+
+- adding two new options, custom filename and filename in output dir [#86](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/86) ([@shindakun](https://github.com/shindakun))
+
+#### Authors: 1
+
+- Steve Layton ([@shindakun](https://github.com/shindakun))
+
+---
+
 # 1.0.22 (Sat Jun 29 2024)
 
 #### 🐛 Bug Fix
