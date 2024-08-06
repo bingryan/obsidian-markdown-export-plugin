@@ -8,7 +8,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        nodejs: [12, 14]
+        nodejs: [18, 20]
 
     steps:
     - uses: actions/checkout@v2
