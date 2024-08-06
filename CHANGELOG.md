@@ -1,3 +1,15 @@
+# 1.0.24 (Tue Aug 06 2024)
+
+#### 🐛 Bug Fix
+
+- fix re groups [#92](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/92) ([@bingryan](https://github.com/bingryan))
+
+#### Authors: 1
+
+- [@bingryan](https://github.com/bingryan)
+
+---
+
 # 1.0.23 (Sun Jul 07 2024)
 
 #### 🐛 Bug Fix
