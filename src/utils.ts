@@ -344,11 +344,6 @@ export async function tryCopyMarkdownByRead(
 			for (const index in imageLinks) {
 				const rawImageLink = imageLinks[index][0];
 
-				const { width, height } = imageLinks[index].groups as {
-					width: string | null;
-					height: string | null;
-				};
-
 				const urlEncodedImageLink =
 					imageLinks[index][7 - imageLinks[index].length];
 
@@ -385,6 +380,7 @@ export async function tryCopyMarkdownByRead(
 				}
 
 				if (plugin.settings.displayImageAsHtml) {
+					const { width = null, height = null } = imageLinks[index]?.groups || {};
 					const style =
 						width && height
 							? ` style='width: {${width}}px; height: ${height}px;'`
