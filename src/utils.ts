@@ -238,16 +238,11 @@ export async function tryCopyImage(
 						continue;
 					}
 
-					let dir = ""
-					if (plugin.settings.includeFileName == true) {
-						dir = filename.replace(".md", "")
-					}
-
 					const targetPath = path
 						.join(
-							plugin.settings.output,
-							dir,
-							plugin.settings.attachment,
+							plugin.settings.relAttachPath ? plugin.settings.output : plugin.settings.attachment, 
+							plugin.settings.includeFileName ? filename.replace(".md", "") : '', 
+							plugin.settings.relAttachPath ? plugin.settings.attachment : '',
 							imageLinkMd5.concat(imageExt),
 						)
 						.replace(/\\/g, "/");
@@ -341,6 +336,17 @@ export async function tryCopyMarkdownByRead(
 	try {
 		await plugin.app.vault.adapter.read(file.path).then(async (content) => {
 			const imageLinks = await getImageLinks(content);
+			if (imageLinks.length > 0) {
+				await tryCreateFolder(
+					plugin,
+					path.join(
+						plugin.settings.relAttachPath ? plugin.settings.output : plugin.settings.attachment, 
+						plugin.settings.includeFileName ? file.name.replace(".md", "") : '', 
+						plugin.settings.relAttachPath ? plugin.settings.attachment : ''
+					)
+				);
+			}
+
 			for (const index in imageLinks) {
 				const rawImageLink = imageLinks[index][0];
 

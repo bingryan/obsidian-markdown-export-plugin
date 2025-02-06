@@ -72,25 +72,13 @@ export default class MarkdownExportPlugin extends Plugin {
 		file: TAbstractFile,
 		outputFormat: string,
 	) {
-
-		let dir = ""
-		if (this.settings.includeFileName == true) {
-			dir = file.name.replace(".md", "")
-		}
-
-		// try create attachment directory
-		await tryCreateFolder(
-			this,
-			path.join(this.settings.output, dir, this.settings.attachment),
-		);
-
 		// run
 		await tryRun(this, file, outputFormat);
 
 		new Notice(
 			`Exporting ${file.path} to ${path.join(
 				this.settings.output,
-				dir,
+				this.settings.includeFileName ? file.name.replace(".md", "") : '',
 				file.name,
 			)}`,
 		);
@@ -222,14 +210,25 @@ class MarkdownExportSettingTab extends PluginSettingTab {
 					}),
 			);
 		new Setting(containerEl)
-			.setName("Custom filename")
+			.setName("Custom Filename")
 			.setDesc("update if you want a custom filename, leave off extension")
 			.addText((text) =>
 				text
-					.setPlaceholder("Enter custom filename")
+					.setPlaceholder("index")
 					.setValue(this.plugin.settings.customFileName)
 					.onChange(async (value) => {
 						this.plugin.settings.customFileName = value;
+						await this.plugin.saveSettings();
+					}),
+			);
+		new Setting(containerEl)
+			.setName("Set Attachment Path as Relative")
+			.setDesc("If enabled, the attachment path will be relative to the output.")
+			.addToggle((toggle) =>
+				toggle
+					.setValue(this.plugin.settings.relAttachPath)
+					.onChange(async (value: boolean) => {
+						this.plugin.settings.relAttachPath = value;
 						await this.plugin.saveSettings();
 					}),
 			);

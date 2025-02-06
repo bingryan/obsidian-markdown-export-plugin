@@ -18,6 +18,7 @@ export interface MarkdownExportPluginSettings {
 	removeOutgoingLinkBrackets: boolean;
 	includeFileName: boolean;
 	customFileName: string;
+	relAttachPath: boolean;
 }
 
 export const DEFAULT_SETTINGS: MarkdownExportPluginSettings = {
@@ -29,4 +30,5 @@ export const DEFAULT_SETTINGS: MarkdownExportPluginSettings = {
 	removeOutgoingLinkBrackets: false,
 	includeFileName: false,
 	customFileName: "",
+	relAttachPath: true,
 };
