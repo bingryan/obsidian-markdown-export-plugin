@@ -9,6 +9,13 @@ export const GFM_IMAGE_FORMAT = "![]({0})";
 
 export const OUTGOING_LINK_REGEXP = /(?<!!)\[\[(.*?)\]\]/g;
 
+export enum OUTPUT_INCLUDE_FILENAME {
+	NONE = '',
+	OUTPUT = 'OUTPUT',
+	ATTACHMENT = 'ATTACH',
+	ALL = 'OUTPUTATTACH'
+}
+
 export interface MarkdownExportPluginSettings {
 	output: string;
 	attachment: string;
@@ -16,7 +23,7 @@ export interface MarkdownExportPluginSettings {
 	GFM: boolean;
 	fileNameEncode: boolean;
 	removeOutgoingLinkBrackets: boolean;
-	includeFileName: boolean;
+	includeFileName: string;
 	customFileName: string;
 	relAttachPath: boolean;
 }
@@ -28,7 +35,7 @@ export const DEFAULT_SETTINGS: MarkdownExportPluginSettings = {
 	GFM: true,
 	fileNameEncode: true,
 	removeOutgoingLinkBrackets: false,
-	includeFileName: false,
+	includeFileName: OUTPUT_INCLUDE_FILENAME.NONE,
 	customFileName: "",
 	relAttachPath: true,
 };

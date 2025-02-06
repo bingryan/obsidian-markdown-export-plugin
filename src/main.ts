@@ -10,8 +10,8 @@ import {
 } from "obsidian";
 import * as path from "path";
 
-import { MarkdownExportPluginSettings, DEFAULT_SETTINGS } from "./config";
-import { tryCreateFolder, tryRun } from "./utils";
+import { MarkdownExportPluginSettings, DEFAULT_SETTINGS, OUTPUT_INCLUDE_FILENAME } from "./config";
+import { tryRun } from "./utils";
 
 export default class MarkdownExportPlugin extends Plugin {
 	settings: MarkdownExportPluginSettings;
@@ -78,7 +78,8 @@ export default class MarkdownExportPlugin extends Plugin {
 		new Notice(
 			`Exporting ${file.path} to ${path.join(
 				this.settings.output,
-				this.settings.includeFileName ? file.name.replace(".md", "") : '',
+				this.settings.includeFileName.includes(OUTPUT_INCLUDE_FILENAME.OUTPUT)
+					? file.name.replace(".md", "") : '',
 				file.name,
 			)}`,
 		);
@@ -197,14 +198,17 @@ class MarkdownExportSettingTab extends PluginSettingTab {
 			);
 
 		new Setting(containerEl)
-			.setName("Include filename in output path")
+			.setName("Create Subdirectory")
 			.setDesc(
-				"false default, if you want to include the filename (without extension) in the output path set this to true",
+				"Determines when a subdirectory with the exported file's name gets created",
 			)
-			.addToggle((toggle) =>
-				toggle
+			.addDropdown((dropdown) =>
+				dropdown
 					.setValue(this.plugin.settings.includeFileName)
-					.onChange(async (value: boolean) => {
+					.addOption(OUTPUT_INCLUDE_FILENAME.NONE, "Never")
+					.addOption(OUTPUT_INCLUDE_FILENAME.ATTACHMENT, "For Attachments")
+					.addOption(OUTPUT_INCLUDE_FILENAME.ALL, "Always")
+					.onChange(async (value) => {
 						this.plugin.settings.includeFileName = value;
 						await this.plugin.saveSettings();
 					}),

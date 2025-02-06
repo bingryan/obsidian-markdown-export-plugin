@@ -9,6 +9,7 @@ import {
 	EMBED_URL_REGEXP,
 	GFM_IMAGE_FORMAT,
 	OUTGOING_LINK_REGEXP,
+	OUTPUT_INCLUDE_FILENAME
 } from "./config";
 import MarkdownExportPlugin from "./main";
 import markdownToHTML from "./renderer";
@@ -241,7 +242,8 @@ export async function tryCopyImage(
 					const targetPath = path
 						.join(
 							plugin.settings.relAttachPath ? plugin.settings.output : plugin.settings.attachment, 
-							plugin.settings.includeFileName ? filename.replace(".md", "") : '', 
+							plugin.settings.includeFileName
+								.includes(OUTPUT_INCLUDE_FILENAME.ATTACHMENT) ? filename.replace(".md", "") : '', 
 							plugin.settings.relAttachPath ? plugin.settings.attachment : '',
 							imageLinkMd5.concat(imageExt),
 						)
@@ -341,7 +343,8 @@ export async function tryCopyMarkdownByRead(
 					plugin,
 					path.join(
 						plugin.settings.relAttachPath ? plugin.settings.output : plugin.settings.attachment, 
-						plugin.settings.includeFileName ? file.name.replace(".md", "") : '', 
+						plugin.settings.includeFileName
+							.includes(OUTPUT_INCLUDE_FILENAME.ATTACHMENT) ? file.name.replace(".md", "") : '', 
 						plugin.settings.relAttachPath ? plugin.settings.attachment : ''
 					)
 				);
@@ -427,14 +430,14 @@ export async function tryCopyMarkdownByRead(
 				}
 			}
 
-			let dir = ""
-			if (plugin.settings.includeFileName == true) {
-				dir = file.name.replace(".md", "")
-			}
-
 			await tryCopyImage(plugin, file.name, file.path);
 
-			const outDir = path.join(plugin.settings.output, dir, outputSubPath);
+			const outDir = path.join(
+				plugin.settings.output,
+				plugin.settings.includeFileName.includes(OUTPUT_INCLUDE_FILENAME.OUTPUT)
+					? file.name.replace(".md", "") : '',
+				outputSubPath
+			);
 
 			await tryCreateFolder(plugin, outDir);
 
