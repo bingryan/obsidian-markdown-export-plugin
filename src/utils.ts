@@ -8,8 +8,7 @@ import {
 	MARKDOWN_ATTACHMENT_URL_REGEXP,
 	EMBED_URL_REGEXP,
 	GFM_IMAGE_FORMAT,
-	OUTGOING_LINK_REGEXP,
-	OUTPUT_INCLUDE_FILENAME
+	OUTGOING_LINK_REGEXP
 } from "./config";
 import MarkdownExportPlugin from "./main";
 import markdownToHTML from "./renderer";
@@ -242,8 +241,7 @@ export async function tryCopyImage(
 					const targetPath = path
 						.join(
 							plugin.settings.relAttachPath ? plugin.settings.output : plugin.settings.attachment, 
-							plugin.settings.includeFileName
-								.includes(OUTPUT_INCLUDE_FILENAME.ATTACHMENT) ? filename.replace(".md", "") : '', 
+							plugin.settings.includeFileName ? filename.replace(".md", "") : '', 
 							plugin.settings.relAttachPath ? plugin.settings.attachment : '',
 							imageLinkMd5.concat(imageExt),
 						)
@@ -343,8 +341,7 @@ export async function tryCopyMarkdownByRead(
 					plugin,
 					path.join(
 						plugin.settings.relAttachPath ? plugin.settings.output : plugin.settings.attachment, 
-						plugin.settings.includeFileName
-							.includes(OUTPUT_INCLUDE_FILENAME.ATTACHMENT) ? file.name.replace(".md", "") : '', 
+						plugin.settings.includeFileName ? file.name.replace(".md", "") : '', 
 						plugin.settings.relAttachPath ? plugin.settings.attachment : ''
 					)
 				);
@@ -432,9 +429,11 @@ export async function tryCopyMarkdownByRead(
 
 			await tryCopyImage(plugin, file.name, file.path);
 
+			// If the user has a custom filename set, we enforce subdirectories to prevent overwriting
 			const outDir = path.join(
 				plugin.settings.output,
-				plugin.settings.includeFileName.includes(OUTPUT_INCLUDE_FILENAME.OUTPUT)
+				(plugin.settings.customFileName != '' ||
+					(plugin.settings.includeFileName && plugin.settings.relAttachPath))
 					? file.name.replace(".md", "") : '',
 				outputSubPath
 			);

@@ -10,7 +10,7 @@ import {
 } from "obsidian";
 import * as path from "path";
 
-import { MarkdownExportPluginSettings, DEFAULT_SETTINGS, OUTPUT_INCLUDE_FILENAME } from "./config";
+import { MarkdownExportPluginSettings, DEFAULT_SETTINGS } from "./config";
 import { tryRun } from "./utils";
 
 export default class MarkdownExportPlugin extends Plugin {
@@ -72,17 +72,23 @@ export default class MarkdownExportPlugin extends Plugin {
 		file: TAbstractFile,
 		outputFormat: string,
 	) {
+		console.log(file)
 		// run
 		await tryRun(this, file, outputFormat);
 
-		new Notice(
-			`Exporting ${file.path} to ${path.join(
-				this.settings.output,
-				this.settings.includeFileName.includes(OUTPUT_INCLUDE_FILENAME.OUTPUT)
-					? file.name.replace(".md", "") : '',
-				file.name,
-			)}`,
-		);
+		if (file.children) {
+			new Notice(
+				`Exporting folder ${file.path} to ${path.join(this.settings.output)}`,
+			);
+		} else {
+			new Notice(
+				`Exporting ${file.path} to ${path.join(
+					this.settings.output,
+					this.settings.includeFileName ? file.name.replace(".md", "") : '',
+					file.name,
+				)}`,
+			);
+		}
 	}
 
 	onunload() {}
@@ -202,13 +208,10 @@ class MarkdownExportSettingTab extends PluginSettingTab {
 			.setDesc(
 				"Determines when a subdirectory with the exported file's name gets created",
 			)
-			.addDropdown((dropdown) =>
-				dropdown
+			.addToggle((toggle) =>
+				toggle
 					.setValue(this.plugin.settings.includeFileName)
-					.addOption(OUTPUT_INCLUDE_FILENAME.NONE, "Never")
-					.addOption(OUTPUT_INCLUDE_FILENAME.ATTACHMENT, "For Attachments")
-					.addOption(OUTPUT_INCLUDE_FILENAME.ALL, "Always")
-					.onChange(async (value) => {
+					.onChange(async (value: boolean) => {
 						this.plugin.settings.includeFileName = value;
 						await this.plugin.saveSettings();
 					}),
