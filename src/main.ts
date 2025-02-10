@@ -10,7 +10,7 @@ import {
 } from "obsidian";
 import * as path from "path";
 
-import { MarkdownExportPluginSettings, DEFAULT_SETTINGS } from "./config";
+import { MarkdownExportPluginSettings, DEFAULT_SETTINGS, OUTPUT_FORMATS } from "./config";
 import { tryRun } from "./utils";
 
 export default class MarkdownExportPlugin extends Plugin {
@@ -41,7 +41,7 @@ export default class MarkdownExportPlugin extends Plugin {
 			}),
 		);
 
-		for (const outputFormat of ["markdown", "HTML"]) {
+		for (const outputFormat of [OUTPUT_FORMATS.MD, OUTPUT_FORMATS.HTML]) {
 			this.addCommand({
 				id: "export-to-" + outputFormat,
 				name: `Export to ${outputFormat}`,
@@ -58,7 +58,7 @@ export default class MarkdownExportPlugin extends Plugin {
 	}
 
 	registerDirMenu(menu: Menu, file: TAbstractFile) {
-		for (const outputFormat of ["markdown", "HTML"]) {
+		for (const outputFormat of [OUTPUT_FORMATS.MD, OUTPUT_FORMATS.HTML]) {
 			const addMenuItem = (item: MenuItem) => {
 				item.setTitle(`Export to ${outputFormat}`);
 				item.onClick(async () => {

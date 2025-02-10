@@ -8,7 +8,8 @@ import {
 	MARKDOWN_ATTACHMENT_URL_REGEXP,
 	EMBED_URL_REGEXP,
 	GFM_IMAGE_FORMAT,
-	OUTGOING_LINK_REGEXP
+	OUTGOING_LINK_REGEXP,
+	OUTPUT_FORMATS
 } from "./config";
 import MarkdownExportPlugin from "./main";
 import markdownToHTML from "./renderer";
@@ -36,7 +37,7 @@ export async function getEmbeds(markdown: string) {
 export function allMarkdownParams(
 	file: TAbstractFile,
 	out: Array<CopyMarkdownOptions>,
-	outputFormat = "markdown",
+	outputFormat = OUTPUT_FORMATS.MD,
 	outputSubPath = ".",
 	parentPath = "",
 ): Array<CopyMarkdownOptions> {
@@ -80,7 +81,7 @@ export function allMarkdownParams(
 export async function tryRun(
 	plugin: MarkdownExportPlugin,
 	file: TAbstractFile,
-	outputFormat = "markdown",
+	outputFormat = OUTPUT_FORMATS.MD,
 ) {
 	// recursive functions are not suitable for this case
 	// if ((<TFile>file).extension) {
@@ -429,7 +430,8 @@ export async function tryCopyMarkdownByRead(
 
 			await tryCopyImage(plugin, file.name, file.path);
 
-			// If the user has a custom filename set, we enforce subdirectories to prevent overwriting
+			// If the user has a custom filename set, we enforce subdirectories to 
+			// prevent rendered files from overwriting each other
 			const outDir = path.join(
 				plugin.settings.output,
 				(plugin.settings.customFileName != '' ||
@@ -441,7 +443,7 @@ export async function tryCopyMarkdownByRead(
 			await tryCreateFolder(plugin, outDir);
 
 			switch (outputFormat) {
-				case "HTML": {
+				case OUTPUT_FORMATS.HTML: {
 					let filename
 					if (plugin.settings.customFileName) {
 						filename = plugin.settings.customFileName + ".md"
@@ -460,7 +462,7 @@ export async function tryCopyMarkdownByRead(
 					await tryCreate(plugin, targetFile, html);
 					break;
 				}
-				case "markdown": {
+				case OUTPUT_FORMATS.MD: {
 					let filename
 					if (plugin.settings.customFileName) {
 						filename = plugin.settings.customFileName + ".md"

@@ -9,6 +9,11 @@ export const GFM_IMAGE_FORMAT = "![]({0})";
 
 export const OUTGOING_LINK_REGEXP = /(?<!!)\[\[(.*?)\]\]/g;
 
+export enum OUTPUT_FORMATS {
+	MD = 'Markdown',
+	HTML = 'HTML'
+}
+
 export interface MarkdownExportPluginSettings {
 	output: string;
 	attachment: string;
