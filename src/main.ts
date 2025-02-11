@@ -7,6 +7,7 @@ import {
 	PluginSettingTab,
 	Setting,
 	TAbstractFile,
+	TFolder,
 } from "obsidian";
 import * as path from "path";
 
@@ -72,11 +73,10 @@ export default class MarkdownExportPlugin extends Plugin {
 		file: TAbstractFile,
 		outputFormat: string,
 	) {
-		console.log(file)
 		// run
 		await tryRun(this, file, outputFormat);
 
-		if (file.children) {
+		if (file instanceof TFolder) {
 			new Notice(
 				`Exporting folder ${file.path} to ${path.join(this.settings.output)}`,
 			);

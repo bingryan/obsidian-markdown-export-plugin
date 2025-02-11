@@ -37,7 +37,7 @@ export async function getEmbeds(markdown: string) {
 export function allMarkdownParams(
 	file: TAbstractFile,
 	out: Array<CopyMarkdownOptions>,
-	outputFormat = OUTPUT_FORMATS.MD,
+	outputFormat: string = OUTPUT_FORMATS.MD,
 	outputSubPath = ".",
 	parentPath = "",
 ): Array<CopyMarkdownOptions> {
@@ -81,7 +81,7 @@ export function allMarkdownParams(
 export async function tryRun(
 	plugin: MarkdownExportPlugin,
 	file: TAbstractFile,
-	outputFormat = OUTPUT_FORMATS.MD,
+	outputFormat: string = OUTPUT_FORMATS.MD,
 ) {
 	// recursive functions are not suitable for this case
 	// if ((<TFile>file).extension) {
