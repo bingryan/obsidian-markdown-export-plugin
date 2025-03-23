@@ -1,3 +1,15 @@
+# 1.0.25 (Sun Mar 23 2025)
+
+#### 🐛 Bug Fix
+
+- Added absolute attachment paths & expanded subdirectory support [#94](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/94) ([@PersonMeetup](https://github.com/PersonMeetup))
+
+#### Authors: 1
+
+- Leslie Swan ([@PersonMeetup](https://github.com/PersonMeetup))
+
+---
+
 # 1.0.24 (Tue Aug 06 2024)
 
 #### 🐛 Bug Fix
