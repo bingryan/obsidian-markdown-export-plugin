@@ -9,6 +9,11 @@ export const GFM_IMAGE_FORMAT = "![]({0})";
 
 export const OUTGOING_LINK_REGEXP = /(?<!!)\[\[(.*?)\]\]/g;
 
+export enum OUTPUT_FORMATS {
+	MD = 'Markdown',
+	HTML = 'HTML'
+}
+
 export interface MarkdownExportPluginSettings {
 	output: string;
 	attachment: string;
@@ -18,6 +23,7 @@ export interface MarkdownExportPluginSettings {
 	removeOutgoingLinkBrackets: boolean;
 	includeFileName: boolean;
 	customFileName: string;
+	relAttachPath: boolean;
 }
 
 export const DEFAULT_SETTINGS: MarkdownExportPluginSettings = {
@@ -29,4 +35,5 @@ export const DEFAULT_SETTINGS: MarkdownExportPluginSettings = {
 	removeOutgoingLinkBrackets: false,
 	includeFileName: false,
 	customFileName: "",
+	relAttachPath: true,
 };

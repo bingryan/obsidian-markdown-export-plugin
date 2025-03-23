@@ -7,11 +7,12 @@ import {
 	PluginSettingTab,
 	Setting,
 	TAbstractFile,
+	TFolder,
 } from "obsidian";
 import * as path from "path";
 
-import { MarkdownExportPluginSettings, DEFAULT_SETTINGS } from "./config";
-import { tryCreateFolder, tryRun } from "./utils";
+import { MarkdownExportPluginSettings, DEFAULT_SETTINGS, OUTPUT_FORMATS } from "./config";
+import { tryRun } from "./utils";
 
 export default class MarkdownExportPlugin extends Plugin {
 	settings: MarkdownExportPluginSettings;
@@ -41,7 +42,7 @@ export default class MarkdownExportPlugin extends Plugin {
 			}),
 		);
 
-		for (const outputFormat of ["markdown", "HTML"]) {
+		for (const outputFormat of [OUTPUT_FORMATS.MD, OUTPUT_FORMATS.HTML]) {
 			this.addCommand({
 				id: "export-to-" + outputFormat,
 				name: `Export to ${outputFormat}`,
@@ -58,7 +59,7 @@ export default class MarkdownExportPlugin extends Plugin {
 	}
 
 	registerDirMenu(menu: Menu, file: TAbstractFile) {
-		for (const outputFormat of ["markdown", "HTML"]) {
+		for (const outputFormat of [OUTPUT_FORMATS.MD, OUTPUT_FORMATS.HTML]) {
 			const addMenuItem = (item: MenuItem) => {
 				item.setTitle(`Export to ${outputFormat}`);
 				item.onClick(async () => {
@@ -72,28 +73,22 @@ export default class MarkdownExportPlugin extends Plugin {
 		file: TAbstractFile,
 		outputFormat: string,
 	) {
-
-		let dir = ""
-		if (this.settings.includeFileName == true) {
-			dir = file.name.replace(".md", "")
-		}
-
-		// try create attachment directory
-		await tryCreateFolder(
-			this,
-			path.join(this.settings.output, dir, this.settings.attachment),
-		);
-
 		// run
 		await tryRun(this, file, outputFormat);
 
-		new Notice(
-			`Exporting ${file.path} to ${path.join(
-				this.settings.output,
-				dir,
-				file.name,
-			)}`,
-		);
+		if (file instanceof TFolder) {
+			new Notice(
+				`Exporting folder ${file.path} to ${path.join(this.settings.output)}`,
+			);
+		} else {
+			new Notice(
+				`Exporting ${file.path} to ${path.join(
+					this.settings.output,
+					this.settings.includeFileName ? file.name.replace(".md", "") : '',
+					file.name,
+				)}`,
+			);
+		}
 	}
 
 	onunload() {}
@@ -209,9 +204,9 @@ class MarkdownExportSettingTab extends PluginSettingTab {
 			);
 
 		new Setting(containerEl)
-			.setName("Include filename in output path")
+			.setName("Create Subdirectory")
 			.setDesc(
-				"false default, if you want to include the filename (without extension) in the output path set this to true",
+				"Determines when a subdirectory with the exported file's name gets created",
 			)
 			.addToggle((toggle) =>
 				toggle
@@ -222,14 +217,25 @@ class MarkdownExportSettingTab extends PluginSettingTab {
 					}),
 			);
 		new Setting(containerEl)
-			.setName("Custom filename")
+			.setName("Custom Filename")
 			.setDesc("update if you want a custom filename, leave off extension")
 			.addText((text) =>
 				text
-					.setPlaceholder("Enter custom filename")
+					.setPlaceholder("index")
 					.setValue(this.plugin.settings.customFileName)
 					.onChange(async (value) => {
 						this.plugin.settings.customFileName = value;
+						await this.plugin.saveSettings();
+					}),
+			);
+		new Setting(containerEl)
+			.setName("Set Attachment Path as Relative")
+			.setDesc("If enabled, the attachment path will be relative to the output.")
+			.addToggle((toggle) =>
+				toggle
+					.setValue(this.plugin.settings.relAttachPath)
+					.onChange(async (value: boolean) => {
+						this.plugin.settings.relAttachPath = value;
 						await this.plugin.saveSettings();
 					}),
 			);

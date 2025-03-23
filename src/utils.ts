@@ -9,6 +9,7 @@ import {
 	EMBED_URL_REGEXP,
 	GFM_IMAGE_FORMAT,
 	OUTGOING_LINK_REGEXP,
+	OUTPUT_FORMATS
 } from "./config";
 import MarkdownExportPlugin from "./main";
 import markdownToHTML from "./renderer";
@@ -36,7 +37,7 @@ export async function getEmbeds(markdown: string) {
 export function allMarkdownParams(
 	file: TAbstractFile,
 	out: Array<CopyMarkdownOptions>,
-	outputFormat = "markdown",
+	outputFormat: string = OUTPUT_FORMATS.MD,
 	outputSubPath = ".",
 	parentPath = "",
 ): Array<CopyMarkdownOptions> {
@@ -80,7 +81,7 @@ export function allMarkdownParams(
 export async function tryRun(
 	plugin: MarkdownExportPlugin,
 	file: TAbstractFile,
-	outputFormat = "markdown",
+	outputFormat: string = OUTPUT_FORMATS.MD,
 ) {
 	// recursive functions are not suitable for this case
 	// if ((<TFile>file).extension) {
@@ -238,16 +239,11 @@ export async function tryCopyImage(
 						continue;
 					}
 
-					let dir = ""
-					if (plugin.settings.includeFileName == true) {
-						dir = filename.replace(".md", "")
-					}
-
 					const targetPath = path
 						.join(
-							plugin.settings.output,
-							dir,
-							plugin.settings.attachment,
+							plugin.settings.relAttachPath ? plugin.settings.output : plugin.settings.attachment, 
+							plugin.settings.includeFileName ? filename.replace(".md", "") : '', 
+							plugin.settings.relAttachPath ? plugin.settings.attachment : '',
 							imageLinkMd5.concat(imageExt),
 						)
 						.replace(/\\/g, "/");
@@ -341,6 +337,17 @@ export async function tryCopyMarkdownByRead(
 	try {
 		await plugin.app.vault.adapter.read(file.path).then(async (content) => {
 			const imageLinks = await getImageLinks(content);
+			if (imageLinks.length > 0) {
+				await tryCreateFolder(
+					plugin,
+					path.join(
+						plugin.settings.relAttachPath ? plugin.settings.output : plugin.settings.attachment, 
+						plugin.settings.includeFileName ? file.name.replace(".md", "") : '', 
+						plugin.settings.relAttachPath ? plugin.settings.attachment : ''
+					)
+				);
+			}
+
 			for (const index in imageLinks) {
 				const rawImageLink = imageLinks[index][0];
 
@@ -421,19 +428,22 @@ export async function tryCopyMarkdownByRead(
 				}
 			}
 
-			let dir = ""
-			if (plugin.settings.includeFileName == true) {
-				dir = file.name.replace(".md", "")
-			}
-
 			await tryCopyImage(plugin, file.name, file.path);
 
-			const outDir = path.join(plugin.settings.output, dir, outputSubPath);
+			// If the user has a custom filename set, we enforce subdirectories to 
+			// prevent rendered files from overwriting each other
+			const outDir = path.join(
+				plugin.settings.output,
+				(plugin.settings.customFileName != '' ||
+					(plugin.settings.includeFileName && plugin.settings.relAttachPath))
+					? file.name.replace(".md", "") : '',
+				outputSubPath
+			);
 
 			await tryCreateFolder(plugin, outDir);
 
 			switch (outputFormat) {
-				case "HTML": {
+				case OUTPUT_FORMATS.HTML: {
 					let filename
 					if (plugin.settings.customFileName) {
 						filename = plugin.settings.customFileName + ".md"
@@ -452,7 +462,7 @@ export async function tryCopyMarkdownByRead(
 					await tryCreate(plugin, targetFile, html);
 					break;
 				}
-				case "markdown": {
+				case OUTPUT_FORMATS.MD: {
 					let filename
 					if (plugin.settings.customFileName) {
 						filename = plugin.settings.customFileName + ".md"
