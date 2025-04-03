@@ -373,13 +373,15 @@ export async function tryCopyMarkdownByRead(
 
 				const clickSubRoute = getClickSubRoute(outputSubPath);
 
-				const hashLink = path
-					.join(
-						clickSubRoute,
-						plugin.settings.attachment,
-						imageLinkMd5.concat(imageExt),
-					)
-					.replace(/\\/g, "/");
+				const hashLink = path.join(
+					clickSubRoute,
+					plugin.settings.relAttachPath ? plugin.settings.attachment : path.join(
+						plugin.settings.customAttachPath ? plugin.settings.customAttachPath : plugin.settings.attachment,
+						plugin.settings.includeFileName ? file.name.replace(".md", "") : '',
+					),
+					imageLinkMd5.concat(imageExt),
+				).replace(/\\/g, "/");
+				console.log(hashLink)
 
 				// filter markdown link eg: http://xxx.png
 				if (urlEncodedImageLink.startsWith("http")) {
