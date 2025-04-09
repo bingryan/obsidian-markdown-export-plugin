@@ -381,7 +381,6 @@ export async function tryCopyMarkdownByRead(
 					),
 					imageLinkMd5.concat(imageExt),
 				).replace(/\\/g, "/");
-				console.log(hashLink)
 
 				// filter markdown link eg: http://xxx.png
 				if (urlEncodedImageLink.startsWith("http")) {
