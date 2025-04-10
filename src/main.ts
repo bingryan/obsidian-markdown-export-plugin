@@ -122,7 +122,7 @@ class MarkdownExportSettingTab extends PluginSettingTab {
 		containerEl.createEl("h2", { text: "Markdown Export" });
 
 		new Setting(containerEl)
-			.setName("Custom default output path")
+			.setName("Output Path")
 			.setDesc("default directory for one-click export")
 			.addText((text) =>
 				text
@@ -135,7 +135,7 @@ class MarkdownExportSettingTab extends PluginSettingTab {
 			);
 
 		new Setting(containerEl)
-			.setName("Custom attachment path(optional)")
+			.setName("Attachment Path (optional)")
 			.setDesc("attachment path, relative to the output path")
 			.addText((text) =>
 				text
@@ -143,6 +143,19 @@ class MarkdownExportSettingTab extends PluginSettingTab {
 					.setValue(this.plugin.settings.attachment)
 					.onChange(async (value) => {
 						this.plugin.settings.attachment = value;
+						await this.plugin.saveSettings();
+					}),
+			);
+
+		new Setting(containerEl)
+			.setName("Custom Attachment Path")
+			.setDesc("Changes an images path in an exported file, rather than use the attachment path. Only applies to unrelative attachments. Useful if your using a static site generator.")
+			.addText((text) =>
+				text
+					.setPlaceholder("Enter attachment path")
+					.setValue(this.plugin.settings.customAttachPath)
+					.onChange(async (value) => {
+						this.plugin.settings.customAttachPath = value;
 						await this.plugin.saveSettings();
 					}),
 			);
