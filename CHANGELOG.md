@@ -1,3 +1,15 @@
+# 1.0.26 (Thu Apr 10 2025)
+
+#### 🐛 Bug Fix
+
+- Fixed broken attachment paths within exported markup [#98](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/98) ([@PersonMeetup](https://github.com/PersonMeetup))
+
+#### Authors: 1
+
+- Leslie Swan ([@PersonMeetup](https://github.com/PersonMeetup))
+
+---
+
 # 1.0.25 (Sun Mar 23 2025)
 
 #### 🐛 Bug Fix
