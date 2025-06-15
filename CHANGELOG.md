@@ -1,3 +1,15 @@
+# 1.0.28 (Sun Jun 15 2025)
+
+#### 🐛 Bug Fix
+
+- chore: add remove meta option [#103](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/103) ([@bingryan](https://github.com/bingryan))
+
+#### Authors: 1
+
+- [@bingryan](https://github.com/bingryan)
+
+---
+
 # 1.0.27 (Sun Jun 15 2025)
 
 #### 🐛 Bug Fix
