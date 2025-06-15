@@ -279,5 +279,18 @@ class MarkdownExportSettingTab extends PluginSettingTab {
                         await this.plugin.saveSettings();
                     })
             );
+        new Setting(containerEl)
+            .setName("Remove YAML Metadata Header")
+            .setDesc(
+                "If enabled, the YAML metadata header will be removed from embedded files when exporting."
+            )
+            .addToggle((toggle) =>
+                toggle
+                    .setValue(this.plugin.settings.removeYamlHeader)
+                    .onChange(async (value: boolean) => {
+                        this.plugin.settings.removeYamlHeader = value;
+                        await this.plugin.saveSettings();
+                    })
+            );
     }
 }

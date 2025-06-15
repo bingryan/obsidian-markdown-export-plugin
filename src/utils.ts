@@ -323,6 +323,10 @@ export async function getEmbedMap(
 
         if (embedContentHtml) {
             let embedValue = htmlToMarkdown(embedContentHtml.innerHTML);
+            if (plugin.settings.removeYamlHeader) {
+                const yamlHeaderRegex = /^---[\s\S]*?---/;
+                embedValue = embedValue.replace(yamlHeaderRegex, "");
+            }
             embedValue =
                 "> " +
                 (embedValue as string)

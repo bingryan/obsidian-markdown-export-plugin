@@ -26,6 +26,7 @@ export interface MarkdownExportPluginSettings {
     customAttachPath: string;
     relAttachPath: boolean;
     convertWikiLinksToMarkdown: boolean;
+    removeYamlHeader: boolean;
 }
 
 export const DEFAULT_SETTINGS: MarkdownExportPluginSettings = {
@@ -40,4 +41,5 @@ export const DEFAULT_SETTINGS: MarkdownExportPluginSettings = {
     customAttachPath: "",
     relAttachPath: true,
     convertWikiLinksToMarkdown: false,
+    removeYamlHeader: false,
 };
