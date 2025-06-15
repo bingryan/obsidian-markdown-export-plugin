@@ -1,3 +1,16 @@
+# 1.0.27 (Sun Jun 15 2025)
+
+#### 🐛 Bug Fix
+
+- feat: add wikilink to markdown link option [#102](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/102) ([@bingryan](https://github.com/bingryan))
+- style: indent_style -> space [#101](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/101) ([@bingryan](https://github.com/bingryan))
+
+#### Authors: 1
+
+- [@bingryan](https://github.com/bingryan)
+
+---
+
 # 1.0.26 (Thu Apr 10 2025)
 
 #### 🐛 Bug Fix
