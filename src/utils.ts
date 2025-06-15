@@ -7,6 +7,7 @@ import {
     ATTACHMENT_URL_REGEXP,
     MARKDOWN_ATTACHMENT_URL_REGEXP,
     EMBED_URL_REGEXP,
+    EMBED_METADATA_REGEXP,
     GFM_IMAGE_FORMAT,
     OUTGOING_LINK_REGEXP,
     OUTPUT_FORMATS,
@@ -323,6 +324,9 @@ export async function getEmbedMap(
 
         if (embedContentHtml) {
             let embedValue = htmlToMarkdown(embedContentHtml.innerHTML);
+            if (plugin.settings.removeYamlHeader) {
+                embedValue = embedValue.replace(EMBED_METADATA_REGEXP, "");
+            }
             embedValue =
                 "> " +
                 (embedValue as string)
