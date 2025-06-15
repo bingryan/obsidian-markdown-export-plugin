@@ -1,3 +1,15 @@
+# 1.0.29 (Sun Jun 15 2025)
+
+#### 🐛 Bug Fix
+
+- refactor: MBED_URL_REGEXP [#104](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/104) ([@bingryan](https://github.com/bingryan))
+
+#### Authors: 1
+
+- [@bingryan](https://github.com/bingryan)
+
+---
+
 # 1.0.28 (Sun Jun 15 2025)
 
 #### 🐛 Bug Fix
