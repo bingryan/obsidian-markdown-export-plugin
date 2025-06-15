@@ -5,6 +5,9 @@ export const MARKDOWN_ATTACHMENT_URL_REGEXP = /!\[(.*?)\]\(((.*?)\.(\w+))\)/g;
 
 export const EMBED_URL_REGEXP = /!\[\[(.*?)\]\]/g;
 
+export const EMBED_METADATA_REGEXP =
+    /^---(?:\n|\r\n)[\s\S]*?(?:\n|\r\n)---(?:\n|\r\n)?/;
+
 export const GFM_IMAGE_FORMAT = "![]({0})";
 
 export const OUTGOING_LINK_REGEXP = /(?<!!)\[\[(.*?)\]\]/g;
