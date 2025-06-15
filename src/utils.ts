@@ -437,6 +437,16 @@ export async function tryCopyMarkdownByRead(
                 content = content.replaceAll(OUTGOING_LINK_REGEXP, "$1");
             }
 
+            if (plugin.settings.convertWikiLinksToMarkdown) {
+                content = content.replace(
+                    /\[\[(.*?)\]\]/g,
+                    (match, linkText) => {
+                        const encodedLink = encodeURIComponent(linkText);
+                        return `[${linkText}](${encodedLink})`;
+                    }
+                );
+            }
+
             const cfile = plugin.app.workspace.getActiveFile();
             if (cfile != undefined) {
                 const embedMap = await getEmbedMap(plugin, content, cfile.path);

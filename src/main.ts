@@ -266,5 +266,18 @@ class MarkdownExportSettingTab extends PluginSettingTab {
                         await this.plugin.saveSettings();
                     })
             );
+        new Setting(containerEl)
+            .setName("Convert WikiLinks to Markdown")
+            .setDesc(
+                "Automatically convert WikiLink style links to Markdown links"
+            )
+            .addToggle((toggle) =>
+                toggle
+                    .setValue(this.plugin.settings.convertWikiLinksToMarkdown)
+                    .onChange(async (value: boolean) => {
+                        this.plugin.settings.convertWikiLinksToMarkdown = value;
+                        await this.plugin.saveSettings();
+                    })
+            );
     }
 }

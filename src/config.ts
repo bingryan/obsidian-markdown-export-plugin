@@ -25,6 +25,7 @@ export interface MarkdownExportPluginSettings {
     customFileName: string;
     customAttachPath: string;
     relAttachPath: boolean;
+    convertWikiLinksToMarkdown: boolean;
 }
 
 export const DEFAULT_SETTINGS: MarkdownExportPluginSettings = {
@@ -38,4 +39,5 @@ export const DEFAULT_SETTINGS: MarkdownExportPluginSettings = {
     customFileName: "",
     customAttachPath: "",
     relAttachPath: true,
+    convertWikiLinksToMarkdown: false,
 };
