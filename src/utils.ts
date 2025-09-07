@@ -340,6 +340,102 @@ export async function getEmbedMap(
     return embedMap;
 }
 
+// Convert Markdown to plain text with specific formatting
+export function convertMarkdownToText(
+    plugin: MarkdownExportPlugin,
+    markdown: string
+): string {
+    let text = markdown;
+
+    // Replace checkboxes
+    // - [ ] becomes ☐
+    // - [x] becomes ☑
+    text = text.replace(
+        /- \[ \]/g,
+        plugin.settings.textExportCheckboxUnchecked
+    );
+    text = text.replace(/- \[x\]/g, plugin.settings.textExportCheckboxChecked);
+
+    // Replace bullet points with specific characters
+    // - becomes ●
+    //   - becomes ￮
+    //     - becomes ￭
+    //       - becomes ►
+    //         - becomes •
+    const lines = text.split("\n");
+    const processedLines = lines.map((line) => {
+        // Count leading spaces or tabs to determine indentation level
+        const leadingWhitespace = line.match(/^(\s*)/)?.[0] || "";
+
+        // Replace bullet points based on indentation level
+        if (line.trim().startsWith("- ")) {
+            // Remove leading whitespace for processing
+            const trimmedLine = line.trim();
+
+            // First, normalize tabs to spaces (1 tab = 4 spaces)
+            const normalizedIndent = leadingWhitespace.replace(/\t/g, "    ");
+            const indentationLevel = Math.floor(normalizedIndent.length / 4);
+            let bulletPointSymbol =
+                plugin.settings.textExportBulletPointMap[indentationLevel * 4];
+
+            // If no symbol is configured for this level, use the default mapping
+            if (!bulletPointSymbol) {
+                // Use the configured symbol for this indentation level, or fall back to defaults
+                switch (indentationLevel) {
+                    case 0:
+                        bulletPointSymbol =
+                            plugin.settings.textExportBulletPointMap[0] || "●";
+                        break;
+                    case 1:
+                        bulletPointSymbol =
+                            plugin.settings.textExportBulletPointMap[4] || "￮";
+                        break;
+                    case 2:
+                        bulletPointSymbol =
+                            plugin.settings.textExportBulletPointMap[8] || "￭";
+                        break;
+                    case 3:
+                        bulletPointSymbol =
+                            plugin.settings.textExportBulletPointMap[12] || "►";
+                        break;
+                    case 4:
+                        bulletPointSymbol =
+                            plugin.settings.textExportBulletPointMap[16] || "•";
+                        break;
+                    default: {
+                        // For deeper levels, use the last configured symbol or default to "•"
+                        const levels = Object.keys(
+                            plugin.settings.textExportBulletPointMap
+                        )
+                            .map(Number)
+                            .sort((a, b) => a - b);
+                        if (levels.length > 0) {
+                            const deepestLevel = levels[levels.length - 1];
+                            bulletPointSymbol =
+                                plugin.settings.textExportBulletPointMap[
+                                    deepestLevel
+                                ] || "•";
+                        } else {
+                            bulletPointSymbol = "•";
+                        }
+                    }
+                }
+            }
+
+            return (
+                leadingWhitespace +
+                bulletPointSymbol +
+                " " +
+                trimmedLine.slice(2)
+            );
+        }
+
+        return line;
+    });
+
+    return processedLines.join("\n");
+}
+
 export async function tryCopyMarkdownByRead(
     plugin: MarkdownExportPlugin,
     { file, outputFormat, outputSubPath = "." }: CopyMarkdownOptions
@@ -509,6 +605,21 @@ export async function tryCopyMarkdownByRead(
                     }
                     const targetFile = path.join(outDir, filename);
                     await tryCreate(plugin, targetFile, content);
+                    break;
+                }
+                case OUTPUT_FORMATS.TEXT: {
+                    let filename;
+                    if (plugin.settings.customFileName) {
+                        filename = plugin.settings.customFileName + ".md";
+                    } else {
+                        filename = file.name;
+                    }
+                    const targetFile = path.join(
+                        outDir,
+                        filename.replace(".md", ".txt")
+                    );
+                    const textContent = convertMarkdownToText(plugin, content);
+                    await tryCreate(plugin, targetFile, textContent);
                     break;
                 }
             }
