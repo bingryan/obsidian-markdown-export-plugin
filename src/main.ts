@@ -46,7 +46,11 @@ export default class MarkdownExportPlugin extends Plugin {
             })
         );
 
-        for (const outputFormat of [OUTPUT_FORMATS.MD, OUTPUT_FORMATS.HTML]) {
+        for (const outputFormat of [
+            OUTPUT_FORMATS.MD,
+            OUTPUT_FORMATS.HTML,
+            OUTPUT_FORMATS.TEXT,
+        ]) {
             this.addCommand({
                 id: "export-to-" + outputFormat,
                 name: `Export to ${outputFormat}`,
@@ -63,7 +67,11 @@ export default class MarkdownExportPlugin extends Plugin {
     }
 
     registerDirMenu(menu: Menu, file: TAbstractFile) {
-        for (const outputFormat of [OUTPUT_FORMATS.MD, OUTPUT_FORMATS.HTML]) {
+        for (const outputFormat of [
+            OUTPUT_FORMATS.MD,
+            OUTPUT_FORMATS.HTML,
+            OUTPUT_FORMATS.TEXT,
+        ]) {
             const addMenuItem = (item: MenuItem) => {
                 item.setTitle(`Export to ${outputFormat}`);
                 item.onClick(async () => {
@@ -127,7 +135,13 @@ class MarkdownExportSettingTab extends PluginSettingTab {
 
         containerEl.empty();
 
-        containerEl.createEl("h2", { text: "Markdown Export" });
+        containerEl.createEl("h1", { text: "Obsidian Markdown Export" });
+        containerEl.createEl("p", { text: "Created by " }).createEl("a", {
+            text: "bingryan 🤓",
+            href: "https://github.com/bingryan",
+        });
+
+        containerEl.createEl("h3", { text: "Baisc Setting" });
 
         new Setting(containerEl)
             .setName("Output Path")
@@ -289,6 +303,137 @@ class MarkdownExportSettingTab extends PluginSettingTab {
                     .setValue(this.plugin.settings.removeYamlHeader)
                     .onChange(async (value: boolean) => {
                         this.plugin.settings.removeYamlHeader = value;
+                        await this.plugin.saveSettings();
+                    })
+            );
+
+        containerEl.createEl("h3", { text: "Export Text Setting" });
+
+        // Bullet point mapping settings
+        containerEl.createEl("h6", { text: "Bullet Point Symbols" });
+        containerEl.createEl("p", {
+            text: "Configure symbols for different indentation levels of bullet points.",
+        });
+
+        new Setting(containerEl)
+            .setName("Level 0 Bullet Point")
+            .setDesc("Symbol for top-level bullet points")
+            .addText((text) =>
+                text
+                    .setPlaceholder("●")
+                    .setValue(
+                        this.plugin.settings.textExportBulletPointMap[0] || "●"
+                    )
+                    .onChange(async (value) => {
+                        this.plugin.settings.textExportBulletPointMap[0] =
+                            value;
+                        await this.plugin.saveSettings();
+                    })
+            );
+
+        new Setting(containerEl)
+            .setName("Level 1 Bullet Point")
+            .setDesc("Symbol for first-level indented bullet points (4 spaces)")
+            .addText((text) =>
+                text
+                    .setPlaceholder("￮")
+                    .setValue(
+                        this.plugin.settings.textExportBulletPointMap[4] || "￮"
+                    )
+                    .onChange(async (value) => {
+                        this.plugin.settings.textExportBulletPointMap[4] =
+                            value;
+                        await this.plugin.saveSettings();
+                    })
+            );
+
+        new Setting(containerEl)
+            .setName("Level 2 Bullet Point")
+            .setDesc(
+                "Symbol for second-level indented bullet points (8 spaces)"
+            )
+            .addText((text) =>
+                text
+                    .setPlaceholder("￭")
+                    .setValue(
+                        this.plugin.settings.textExportBulletPointMap[8] || "￭"
+                    )
+                    .onChange(async (value) => {
+                        this.plugin.settings.textExportBulletPointMap[8] =
+                            value;
+                        await this.plugin.saveSettings();
+                    })
+            );
+
+        new Setting(containerEl)
+            .setName("Level 3 Bullet Point")
+            .setDesc(
+                "Symbol for third-level indented bullet points (12 spaces)"
+            )
+            .addText((text) =>
+                text
+                    .setPlaceholder("►")
+                    .setValue(
+                        this.plugin.settings.textExportBulletPointMap[12] || "►"
+                    )
+                    .onChange(async (value) => {
+                        this.plugin.settings.textExportBulletPointMap[12] =
+                            value;
+                        await this.plugin.saveSettings();
+                    })
+            );
+
+        new Setting(containerEl)
+            .setName("Level 4 Bullet Point")
+            .setDesc(
+                "Symbol for fourth-level indented bullet points (16 spaces)"
+            )
+            .addText((text) =>
+                text
+                    .setPlaceholder("•")
+                    .setValue(
+                        this.plugin.settings.textExportBulletPointMap[16] || "•"
+                    )
+                    .onChange(async (value) => {
+                        this.plugin.settings.textExportBulletPointMap[16] =
+                            value;
+                        await this.plugin.saveSettings();
+                    })
+            );
+
+        // Checkbox symbols settings
+        containerEl.createEl("h6", { text: "Checkbox Symbols" });
+        containerEl.createEl("p", {
+            text: "Configure symbols for checkboxes.",
+        });
+
+        new Setting(containerEl)
+            .setName("Unchecked Checkbox")
+            .setDesc("Symbol for unchecked checkboxes")
+            .addText((text) =>
+                text
+                    .setPlaceholder("☐")
+                    .setValue(
+                        this.plugin.settings.textExportCheckboxUnchecked || "☐"
+                    )
+                    .onChange(async (value) => {
+                        this.plugin.settings.textExportCheckboxUnchecked =
+                            value;
+                        await this.plugin.saveSettings();
+                    })
+            );
+
+        new Setting(containerEl)
+            .setName("Checked Checkbox")
+            .setDesc("Symbol for checked checkboxes")
+            .addText((text) =>
+                text
+                    .setPlaceholder("☑")
+                    .setValue(
+                        this.plugin.settings.textExportCheckboxChecked || "☑"
+                    )
+                    .onChange(async (value) => {
+                        this.plugin.settings.textExportCheckboxChecked = value;
                         await this.plugin.saveSettings();
                     })
             );

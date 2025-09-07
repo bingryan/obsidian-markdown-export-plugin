@@ -15,6 +15,7 @@ export const OUTGOING_LINK_REGEXP = /(?<!!)\[\[(.*?)\]\]/g;
 export enum OUTPUT_FORMATS {
     MD = "Markdown",
     HTML = "HTML",
+    TEXT = "Text",
 }
 
 export interface MarkdownExportPluginSettings {
@@ -30,6 +31,10 @@ export interface MarkdownExportPluginSettings {
     relAttachPath: boolean;
     convertWikiLinksToMarkdown: boolean;
     removeYamlHeader: boolean;
+    // Text export settings
+    textExportBulletPointMap: Record<number, string>;
+    textExportCheckboxUnchecked: string;
+    textExportCheckboxChecked: string;
 }
 
 export const DEFAULT_SETTINGS: MarkdownExportPluginSettings = {
@@ -45,4 +50,14 @@ export const DEFAULT_SETTINGS: MarkdownExportPluginSettings = {
     relAttachPath: true,
     convertWikiLinksToMarkdown: false,
     removeYamlHeader: false,
+    // Text export settings
+    textExportBulletPointMap: {
+        0: "●",
+        4: "￮",
+        8: "￭",
+        12: "►",
+        16: "•"
+    },
+    textExportCheckboxUnchecked: "☐",
+    textExportCheckboxChecked: "☑"
 };
