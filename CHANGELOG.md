@@ -1,3 +1,15 @@
+# 1.0.30 (Sun Sep 07 2025)
+
+#### 🐛 Bug Fix
+
+- feat: add export to text [#110](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/110) ([@bingryan](https://github.com/bingryan))
+
+#### Authors: 1
+
+- [@bingryan](https://github.com/bingryan)
+
+---
+
 # 1.0.29 (Sun Jun 15 2025)
 
 #### 🐛 Bug Fix
