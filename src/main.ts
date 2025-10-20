@@ -323,6 +323,20 @@ class MarkdownExportSettingTab extends PluginSettingTab {
                     })
             );
 
+        new Setting(containerEl)
+            .setName("Export All Attachments")
+            .setDesc(
+                "If enabled, all linked files will be exported, including non-image attachments like PDFs, documents, etc. This applies to both [[file.pdf]] and ![[file.pdf]] syntax."
+            )
+            .addToggle((toggle) =>
+                toggle
+                    .setValue(this.plugin.settings.exportAllAttachments)
+                    .onChange(async (value: boolean) => {
+                        this.plugin.settings.exportAllAttachments = value;
+                        await this.plugin.saveSettings();
+                    })
+            );
+
         containerEl.createEl("h3", { text: "Export Text Setting" });
 
         // Bullet point mapping settings

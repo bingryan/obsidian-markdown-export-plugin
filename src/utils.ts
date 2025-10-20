@@ -26,6 +26,13 @@ export async function getOutgoingLinks(markdown: string) {
     return Array.from(outgoingLinks);
 }
 
+export async function getAllFileLinks(markdown: string) {
+    // Match both ![[file]] (embedded) and [[file]] (linked) patterns for all file types
+    const allFileLinksRegexp = /\!?\[\[((.*?)\.([\w]+))(?:\s*\|\s*.*?)?\]\]/g;
+    const allFileLinks = markdown.matchAll(allFileLinksRegexp);
+    return Array.from(allFileLinks);
+}
+
 export async function getImageLinks(markdown: string) {
     const imageLinks = markdown.matchAll(ATTACHMENT_URL_REGEXP);
     const markdownImageLinks = markdown.matchAll(
@@ -411,6 +418,131 @@ export async function tryCopyImage(
     }
 }
 
+export async function tryCopyAllAttachments(
+    plugin: MarkdownExportPlugin,
+    filename: string,
+    contentPath: string,
+    rootFile?: TAbstractFile
+) {
+    try {
+        await plugin.app.vault.adapter
+            .read(contentPath)
+            .then(async (content) => {
+                const allFileLinks = await getAllFileLinks(content);
+                for (const index in allFileLinks) {
+                    const rawFileLink = allFileLinks[index][0];
+                    const fullFileName = allFileLinks[index][1]; // e.g., "document.pdf"
+                    const fileNameWithoutExt = allFileLinks[index][2]; // e.g., "document"
+                    const fileExt = allFileLinks[index][3]; // e.g., "pdf"
+
+                    // Skip if it's an image (already handled by tryCopyImage)
+                    const imageExtensions = ['png', 'jpg', 'jpeg', 'gif', 'bmp', 'svg', 'webp', 'tiff'];
+                    if (imageExtensions.includes(fileExt.toLowerCase())) {
+                        continue;
+                    }
+
+                    // Skip markdown files (handled by recursive export)
+                    if (fileExt.toLowerCase() === 'md') {
+                        continue;
+                    }
+
+                    // Skip HTTP links
+                    if (fullFileName.startsWith("http")) {
+                        continue;
+                    }
+
+                    // Clean the file link (remove display text if any)
+                    let cleanFileName = fullFileName;
+                    if (cleanFileName.contains("|")) {
+                        cleanFileName = cleanFileName.split("|")[0];
+                    }
+
+                    const baseFileName = path.parse(path.basename(cleanFileName)).name;
+                    const fileLinkMd5 = plugin.settings.fileNameEncode
+                        ? md5(cleanFileName)
+                        : baseFileName;
+                    const cleanFileExt = path.extname(cleanFileName);
+                    
+                    // Resolve the file path
+                    const linkedFile = plugin.app.metadataCache.getFirstLinkpathDest(
+                        cleanFileName,
+                        contentPath
+                    );
+
+                    const sourcePath =
+                        linkedFile !== null
+                            ? linkedFile.path
+                            : path.join(path.dirname(contentPath), cleanFileName);
+
+                    // Calculate target path
+                    let targetPath: string;
+                    if (plugin.settings.recursiveExport && rootFile) {
+                        // In recursive mode, use root file for target path
+                        const rootFileName = rootFile instanceof TFile ? rootFile.name : "export";
+                        targetPath = path
+                            .join(
+                                plugin.settings.relAttachPath
+                                    ? plugin.settings.output
+                                    : plugin.settings.attachment,
+                                plugin.settings.includeFileName
+                                    ? rootFileName.replace(".md", "")
+                                    : "",
+                                plugin.settings.relAttachPath
+                                    ? plugin.settings.attachment
+                                    : "",
+                                fileLinkMd5.concat(cleanFileExt)
+                            )
+                            .replace(/\\/g, "/");
+                    } else {
+                        // Original behavior for non-recursive export
+                        targetPath = path
+                            .join(
+                                plugin.settings.relAttachPath
+                                    ? plugin.settings.output
+                                    : plugin.settings.attachment,
+                                plugin.settings.includeFileName
+                                    ? filename.replace(".md", "")
+                                    : "",
+                                plugin.settings.relAttachPath
+                                    ? plugin.settings.attachment
+                                    : "",
+                                fileLinkMd5.concat(cleanFileExt)
+                            )
+                            .replace(/\\/g, "/");
+                    }
+
+                    try {
+                        if (!fileExists(targetPath)) {
+                            if (
+                                plugin.settings.output.startsWith("/") ||
+                                path.win32.isAbsolute(plugin.settings.output)
+                            ) {
+                                const resourceOsPath = getResourceOsPath(
+                                    plugin,
+                                    linkedFile
+                                );
+                                fs.copyFileSync(resourceOsPath, targetPath);
+                            } else {
+                                await plugin.app.vault.adapter.copy(
+                                    sourcePath,
+                                    targetPath
+                                );
+                            }
+                        }
+                    } catch (error) {
+                        console.error(
+                            `Failed to copy attachment from ${sourcePath} to ${targetPath}: ${error.message}`
+                        );
+                    }
+                }
+            });
+    } catch (error) {
+        if (!error.message.contains("file already exists")) {
+            throw error;
+        }
+    }
+}
+
 export async function tryCopyMarkdown(
     plugin: MarkdownExportPlugin,
     contentPath: string,
@@ -567,8 +699,14 @@ export async function tryCopyMarkdownByRead(
 ) {
     try {
         await plugin.app.vault.adapter.read(file.path).then(async (content) => {
+            // Get both image links and all file links based on settings
             const imageLinks = await getImageLinks(content);
-            if (imageLinks.length > 0) {
+            const allFileLinks = plugin.settings.exportAllAttachments ? await getAllFileLinks(content) : [];
+            
+            // Combine links for attachment directory creation check
+            const totalAttachmentLinks = imageLinks.length + allFileLinks.length;
+            
+            if (totalAttachmentLinks > 0) {
                 let attachmentDir: string;
                 if (plugin.settings.recursiveExport && rootFile) {
                     // In recursive mode, use root file for attachment directory
@@ -743,6 +881,11 @@ export async function tryCopyMarkdownByRead(
             }
 
             await tryCopyImage(plugin, file.name, file.path, rootFile);
+
+            // Process all file attachments if exportAllAttachments is enabled
+            if (plugin.settings.exportAllAttachments) {
+                await tryCopyAllAttachments(plugin, file.name, file.path, rootFile);
+            }
 
             // If the user has a custom filename set, we enforce subdirectories to
             // prevent rendered files from overwriting each other
