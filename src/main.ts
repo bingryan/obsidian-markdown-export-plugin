@@ -307,6 +307,22 @@ class MarkdownExportSettingTab extends PluginSettingTab {
                     })
             );
 
+        containerEl.createEl("h3", { text: "Advanced Export Settings" });
+        
+        new Setting(containerEl)
+            .setName("Recursive Export")
+            .setDesc(
+                "If enabled, all linked markdown files will be exported recursively. This will follow internal links and export referenced files to avoid broken links. Circular references are automatically detected and prevented."
+            )
+            .addToggle((toggle) =>
+                toggle
+                    .setValue(this.plugin.settings.recursiveExport)
+                    .onChange(async (value: boolean) => {
+                        this.plugin.settings.recursiveExport = value;
+                        await this.plugin.saveSettings();
+                    })
+            );
+
         containerEl.createEl("h3", { text: "Export Text Setting" });
 
         // Bullet point mapping settings

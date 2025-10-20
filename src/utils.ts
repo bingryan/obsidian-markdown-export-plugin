@@ -21,6 +21,11 @@ type CopyMarkdownOptions = {
     outputSubPath: string;
 };
 
+export async function getOutgoingLinks(markdown: string) {
+    const outgoingLinks = markdown.matchAll(OUTGOING_LINK_REGEXP);
+    return Array.from(outgoingLinks);
+}
+
 export async function getImageLinks(markdown: string) {
     const imageLinks = markdown.matchAll(ATTACHMENT_URL_REGEXP);
     const markdownImageLinks = markdown.matchAll(
@@ -97,12 +102,109 @@ export async function tryRun(
 
     try {
         const params = allMarkdownParams(file, [], outputFormat);
-        for (const param of params) {
-            await tryCopyMarkdownByRead(plugin, param);
+        
+        if (plugin.settings.recursiveExport) {
+            // Use Set to track processed files and avoid circular references
+            const processedFiles = new Set<string>();
+            const allFilesToProcess = new Set<CopyMarkdownOptions>();
+            
+            // Get the root file (first file being exported) to determine base output path
+            const rootFile = params.length > 0 ? params[0].file : file;
+            
+            // Add initial files to the processing queue
+            for (const param of params) {
+                allFilesToProcess.add(param);
+            }
+            
+            // Process files recursively with root file context
+            await processFilesRecursively(plugin, allFilesToProcess, processedFiles, outputFormat, rootFile);
+        } else {
+            // Original behavior for non-recursive export
+            for (const param of params) {
+                await tryCopyMarkdownByRead(plugin, param);
+            }
         }
     } catch (error) {
         if (!error.message.contains("file already exists")) {
             throw error;
+        }
+    }
+}
+
+/**
+ * Process files recursively, following internal links and avoiding circular references
+ */
+async function processFilesRecursively(
+    plugin: MarkdownExportPlugin,
+    filesToProcess: Set<CopyMarkdownOptions>,
+    processedFiles: Set<string>,
+    outputFormat: string,
+    rootFile: TAbstractFile
+) {
+    const processQueue = Array.from(filesToProcess);
+    
+    for (const fileParam of processQueue) {
+        const filePath = fileParam.file.path;
+        
+        // Skip if already processed to avoid circular references
+        if (processedFiles.has(filePath)) {
+            continue;
+        }
+        
+        // Mark as processed before processing to prevent infinite loops
+        processedFiles.add(filePath);
+        
+        // Process the current file with root file context for recursive exports
+        await tryCopyMarkdownByRead(plugin, fileParam, rootFile);
+        
+        // Only process markdown files for recursive link detection
+        if ((<TFile>fileParam.file).extension === 'md') {
+            try {
+                // Read file content to find internal links
+                const content = await plugin.app.vault.adapter.read(filePath);
+                const outgoingLinks = await getOutgoingLinks(content);
+                
+                // Process each outgoing link
+                for (const linkMatch of outgoingLinks) {
+                    const linkText = linkMatch[1];
+                    
+                    // Skip if link is empty or already processed
+                    if (!linkText || processedFiles.has(linkText)) {
+                        continue;
+                    }
+                    
+                    // Resolve the link to an actual file
+                    const linkedFile = plugin.app.metadataCache.getFirstLinkpathDest(
+                        linkText,
+                        filePath
+                    );
+                    
+                    // If the linked file exists and is a markdown file, add it to the processing queue
+                    if (linkedFile && linkedFile instanceof TFile && linkedFile.extension === 'md') {
+                        const linkedFilePath = linkedFile.path;
+                        
+                        // Skip if already processed
+                        if (!processedFiles.has(linkedFilePath)) {
+                            const linkedFileParam: CopyMarkdownOptions = {
+                                file: linkedFile,
+                                outputFormat: outputFormat,
+                                outputSubPath: "." // All linked files go to the root export directory
+                            };
+                            
+                            // Recursively process the linked file with root file context
+                            await processFilesRecursively(
+                                plugin,
+                                new Set([linkedFileParam]),
+                                processedFiles,
+                                outputFormat,
+                                rootFile
+                            );
+                        }
+                    }
+                }
+            } catch (error) {
+                console.warn(`Failed to process recursive links for ${filePath}: ${error.message}`);
+            }
         }
     }
 }
@@ -200,7 +302,8 @@ export async function tryCreate(
 export async function tryCopyImage(
     plugin: MarkdownExportPlugin,
     filename: string,
-    contentPath: string
+    contentPath: string,
+    rootFile?: TAbstractFile
 ) {
     try {
         await plugin.app.vault.adapter
@@ -240,20 +343,41 @@ export async function tryCopyImage(
                         continue;
                     }
 
-                    const targetPath = path
-                        .join(
-                            plugin.settings.relAttachPath
-                                ? plugin.settings.output
-                                : plugin.settings.attachment,
-                            plugin.settings.includeFileName
-                                ? filename.replace(".md", "")
-                                : "",
-                            plugin.settings.relAttachPath
-                                ? plugin.settings.attachment
-                                : "",
-                            imageLinkMd5.concat(imageExt)
-                        )
-                        .replace(/\\/g, "/");
+                    let targetPath: string;
+                    if (plugin.settings.recursiveExport && rootFile) {
+                        // In recursive mode, use root file for target path
+                        const rootFileName = rootFile instanceof TFile ? rootFile.name : "export";
+                        targetPath = path
+                            .join(
+                                plugin.settings.relAttachPath
+                                    ? plugin.settings.output
+                                    : plugin.settings.attachment,
+                                plugin.settings.includeFileName
+                                    ? rootFileName.replace(".md", "")
+                                    : "",
+                                plugin.settings.relAttachPath
+                                    ? plugin.settings.attachment
+                                    : "",
+                                imageLinkMd5.concat(imageExt)
+                            )
+                            .replace(/\\/g, "/");
+                    } else {
+                        // Original behavior for non-recursive export
+                        targetPath = path
+                            .join(
+                                plugin.settings.relAttachPath
+                                    ? plugin.settings.output
+                                    : plugin.settings.attachment,
+                                plugin.settings.includeFileName
+                                    ? filename.replace(".md", "")
+                                    : "",
+                                plugin.settings.relAttachPath
+                                    ? plugin.settings.attachment
+                                    : "",
+                                imageLinkMd5.concat(imageExt)
+                            )
+                            .replace(/\\/g, "/");
+                    }
 
                     try {
                         if (!fileExists(targetPath)) {
@@ -438,15 +562,31 @@ export function convertMarkdownToText(
 
 export async function tryCopyMarkdownByRead(
     plugin: MarkdownExportPlugin,
-    { file, outputFormat, outputSubPath = "." }: CopyMarkdownOptions
+    { file, outputFormat, outputSubPath = "." }: CopyMarkdownOptions,
+    rootFile?: TAbstractFile
 ) {
     try {
         await plugin.app.vault.adapter.read(file.path).then(async (content) => {
             const imageLinks = await getImageLinks(content);
             if (imageLinks.length > 0) {
-                await tryCreateFolder(
-                    plugin,
-                    path.join(
+                let attachmentDir: string;
+                if (plugin.settings.recursiveExport && rootFile) {
+                    // In recursive mode, use root file for attachment directory
+                    const rootFileName = rootFile instanceof TFile ? rootFile.name : "export";
+                    attachmentDir = path.join(
+                        plugin.settings.relAttachPath
+                            ? plugin.settings.output
+                            : plugin.settings.attachment,
+                        plugin.settings.includeFileName
+                            ? rootFileName.replace(".md", "")
+                            : "",
+                        plugin.settings.relAttachPath
+                            ? plugin.settings.attachment
+                            : ""
+                    );
+                } else {
+                    // Original behavior for non-recursive export
+                    attachmentDir = path.join(
                         plugin.settings.relAttachPath
                             ? plugin.settings.output
                             : plugin.settings.attachment,
@@ -456,8 +596,9 @@ export async function tryCopyMarkdownByRead(
                         plugin.settings.relAttachPath
                             ? plugin.settings.attachment
                             : ""
-                    )
-                );
+                    );
+                }
+                await tryCreateFolder(plugin, attachmentDir);
             }
 
             for (const index in imageLinks) {
@@ -485,22 +626,45 @@ export async function tryCopyMarkdownByRead(
 
                 const clickSubRoute = getClickSubRoute(outputSubPath);
 
-                const hashLink = path
-                    .join(
-                        clickSubRoute,
-                        plugin.settings.relAttachPath
-                            ? plugin.settings.attachment
-                            : path.join(
-                                  plugin.settings.customAttachPath
-                                      ? plugin.settings.customAttachPath
-                                      : plugin.settings.attachment,
-                                  plugin.settings.includeFileName
-                                      ? file.name.replace(".md", "")
-                                      : ""
-                              ),
-                        imageLinkMd5.concat(imageExt)
-                    )
-                    .replace(/\\/g, "/");
+                let hashLink: string;
+                if (plugin.settings.recursiveExport && rootFile) {
+                    // In recursive mode, all images point to root file's attachment folder
+                    const rootFileName = rootFile instanceof TFile ? rootFile.name : "export";
+                    hashLink = path
+                        .join(
+                            clickSubRoute,
+                            plugin.settings.relAttachPath
+                                ? plugin.settings.attachment
+                                : path.join(
+                                      plugin.settings.customAttachPath
+                                          ? plugin.settings.customAttachPath
+                                          : plugin.settings.attachment,
+                                      plugin.settings.includeFileName
+                                          ? rootFileName.replace(".md", "")
+                                          : ""
+                                  ),
+                            imageLinkMd5.concat(imageExt)
+                        )
+                        .replace(/\\/g, "/");
+                } else {
+                    // Original behavior for non-recursive export
+                    hashLink = path
+                        .join(
+                            clickSubRoute,
+                            plugin.settings.relAttachPath
+                                ? plugin.settings.attachment
+                                : path.join(
+                                      plugin.settings.customAttachPath
+                                          ? plugin.settings.customAttachPath
+                                          : plugin.settings.attachment,
+                                      plugin.settings.includeFileName
+                                          ? file.name.replace(".md", "")
+                                          : ""
+                                  ),
+                            imageLinkMd5.concat(imageExt)
+                        )
+                        .replace(/\\/g, "/");
+                }
 
                 // filter markdown link eg: http://xxx.png
                 if (urlEncodedImageLink.startsWith("http")) {
@@ -541,8 +705,26 @@ export async function tryCopyMarkdownByRead(
                 content = content.replace(
                     /\[\[(.*?)\]\]/g,
                     (match, linkText) => {
-                        const encodedLink = encodeURIComponent(linkText);
-                        return `[${linkText}](${encodedLink})`;
+                        if (plugin.settings.recursiveExport) {
+                            // In recursive mode, adjust links to point to exported files
+                            // Remove any path separators and just use the filename
+                            const cleanLinkText = linkText.split('/').pop() || linkText;
+                            const encodedLink = encodeURIComponent(cleanLinkText);
+                            return `[${linkText}](${encodedLink}.md)`;
+                        } else {
+                            const encodedLink = encodeURIComponent(linkText);
+                            return `[${linkText}](${encodedLink})`;
+                        }
+                    }
+                );
+            } else if (plugin.settings.recursiveExport) {
+                // Even if not converting to markdown links, we need to handle wikilinks in recursive mode
+                content = content.replace(
+                    /\[\[(.*?)\]\]/g,
+                    (match, linkText) => {
+                        // In recursive mode, keep the link but adjust the path if needed
+                        const cleanLinkText = linkText.split('/').pop() || linkText;
+                        return `[[${cleanLinkText}]]`;
                     }
                 );
             }
@@ -560,19 +742,36 @@ export async function tryCopyMarkdownByRead(
                 }
             }
 
-            await tryCopyImage(plugin, file.name, file.path);
+            await tryCopyImage(plugin, file.name, file.path, rootFile);
 
             // If the user has a custom filename set, we enforce subdirectories to
             // prevent rendered files from overwriting each other
-            const outDir = path.join(
-                plugin.settings.output,
-                plugin.settings.customFileName != "" ||
-                    (plugin.settings.includeFileName &&
-                        plugin.settings.relAttachPath)
-                    ? file.name.replace(".md", "")
-                    : "",
-                outputSubPath
-            );
+            let outDir: string;
+            
+            if (plugin.settings.recursiveExport && rootFile) {
+                // In recursive mode, put all files in the root file's output directory
+                // Use the root file name for directory structure, not the current file
+                const rootFileName = rootFile instanceof TFile ? rootFile.name : "export";
+                outDir = path.join(
+                    plugin.settings.output,
+                    plugin.settings.customFileName != "" ||
+                        (plugin.settings.includeFileName &&
+                            plugin.settings.relAttachPath)
+                        ? rootFileName.replace(".md", "")
+                        : ""
+                );
+            } else {
+                // Original behavior for non-recursive export
+                outDir = path.join(
+                    plugin.settings.output,
+                    plugin.settings.customFileName != "" ||
+                        (plugin.settings.includeFileName &&
+                            plugin.settings.relAttachPath)
+                        ? file.name.replace(".md", "")
+                        : "",
+                    outputSubPath
+                );
+            }
 
             await tryCreateFolder(plugin, outDir);
 

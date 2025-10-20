@@ -31,6 +31,8 @@ export interface MarkdownExportPluginSettings {
     relAttachPath: boolean;
     convertWikiLinksToMarkdown: boolean;
     removeYamlHeader: boolean;
+    // Recursive export settings
+    recursiveExport: boolean;
     // Text export settings
     textExportBulletPointMap: Record<number, string>;
     textExportCheckboxUnchecked: string;
@@ -50,6 +52,8 @@ export const DEFAULT_SETTINGS: MarkdownExportPluginSettings = {
     relAttachPath: true,
     convertWikiLinksToMarkdown: false,
     removeYamlHeader: false,
+    // Recursive export settings
+    recursiveExport: false,
     // Text export settings
     textExportBulletPointMap: {
         0: "●",
