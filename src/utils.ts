@@ -11,6 +11,7 @@ import {
     GFM_IMAGE_FORMAT,
     OUTGOING_LINK_REGEXP,
     OUTPUT_FORMATS,
+    resolvePathVariables,
 } from "./config";
 import MarkdownExportPlugin from "./main";
 import markdownToHTML from "./renderer";
@@ -207,6 +208,11 @@ export async function tryCopyImage(
             .read(contentPath)
             .then(async (content) => {
                 const imageLinks = await getImageLinks(content);
+                // 获取 vault 名称用于变量替换
+                const vaultName = plugin.app.vault.getName();
+                // 获取文件名（去掉扩展名）用于变量替换
+                const fileNameWithoutExt = filename.replace(/\.[^/.]+$/, "");
+                
                 for (const index in imageLinks) {
                     const urlEncodedImageLink =
                         imageLinks[index][7 - imageLinks[index].length];
@@ -240,16 +246,23 @@ export async function tryCopyImage(
                         continue;
                     }
 
+                    // 解析附件路径中的变量
+                    const resolvedAttachPath = resolvePathVariables(
+                        plugin.settings.attachment,
+                        fileNameWithoutExt,
+                        vaultName
+                    );
+
                     const targetPath = path
                         .join(
                             plugin.settings.relAttachPath
                                 ? plugin.settings.output
-                                : plugin.settings.attachment,
+                                : resolvedAttachPath,
                             plugin.settings.includeFileName
-                                ? filename.replace(".md", "")
+                                ? fileNameWithoutExt
                                 : "",
                             plugin.settings.relAttachPath
-                                ? plugin.settings.attachment
+                                ? resolvedAttachPath
                                 : "",
                             imageLinkMd5.concat(imageExt)
                         )
@@ -443,18 +456,34 @@ export async function tryCopyMarkdownByRead(
     try {
         await plugin.app.vault.adapter.read(file.path).then(async (content) => {
             const imageLinks = await getImageLinks(content);
+            // 解析变量（用于生成目录与链接）
+            const vaultName = plugin.app.vault.getName();
+            const fileNameWithoutExt = file.name.replace(/\.[^/.]+$/, "");
+            const resolvedAttachPath = resolvePathVariables(
+                plugin.settings.attachment,
+                fileNameWithoutExt,
+                vaultName
+            );
+            const resolvedCustomAttachPath = plugin.settings.customAttachPath
+                ? resolvePathVariables(
+                      plugin.settings.customAttachPath,
+                      fileNameWithoutExt,
+                      vaultName
+                  )
+                : plugin.settings.customAttachPath;
+
             if (imageLinks.length > 0) {
                 await tryCreateFolder(
                     plugin,
                     path.join(
                         plugin.settings.relAttachPath
                             ? plugin.settings.output
-                            : plugin.settings.attachment,
+                            : resolvedAttachPath,
                         plugin.settings.includeFileName
                             ? file.name.replace(".md", "")
                             : "",
                         plugin.settings.relAttachPath
-                            ? plugin.settings.attachment
+                            ? resolvedAttachPath
                             : ""
                     )
                 );
@@ -485,21 +514,19 @@ export async function tryCopyMarkdownByRead(
 
                 const clickSubRoute = getClickSubRoute(outputSubPath);
 
+                const baseAttachPath = plugin.settings.relAttachPath
+                    ? resolvedAttachPath
+                    : path.join(
+                          resolvedCustomAttachPath
+                              ? resolvedCustomAttachPath
+                              : resolvedAttachPath,
+                          plugin.settings.includeFileName
+                              ? file.name.replace(".md", "")
+                              : ""
+                      );
+
                 const hashLink = path
-                    .join(
-                        clickSubRoute,
-                        plugin.settings.relAttachPath
-                            ? plugin.settings.attachment
-                            : path.join(
-                                  plugin.settings.customAttachPath
-                                      ? plugin.settings.customAttachPath
-                                      : plugin.settings.attachment,
-                                  plugin.settings.includeFileName
-                                      ? file.name.replace(".md", "")
-                                      : ""
-                              ),
-                        imageLinkMd5.concat(imageExt)
-                    )
+                    .join(clickSubRoute, baseAttachPath, imageLinkMd5.concat(imageExt))
                     .replace(/\\/g, "/");
 
                 // filter markdown link eg: http://xxx.png
