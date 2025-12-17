@@ -91,7 +91,7 @@ export function resolvePathVariables(
     const now = new Date();
     
     // 格式化函数
-    const pad = (num: number, len: number = 2) => String(num).padStart(len, "0");
+    const pad = (num: number, len = 2) => String(num).padStart(len, "0");
     
     const variables: Record<string, string> = {
         fileName: fileName.replace(/\.[^/.]+$/, ""), // 移除扩展名
