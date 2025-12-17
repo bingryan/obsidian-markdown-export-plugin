@@ -85,8 +85,8 @@ export const DEFAULT_SETTINGS: MarkdownExportPluginSettings = {
  */
 export function resolvePathVariables(
     pathTemplate: string,
-    fileName: string = "",
-    vaultName: string = ""
+    fileName = "",
+    vaultName = ""
 ): string {
     const now = new Date();
     
