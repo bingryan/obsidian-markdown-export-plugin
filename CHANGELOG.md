@@ -1,3 +1,22 @@
+# 1.0.31 (Wed Dec 17 2025)
+
+#### ⚠️ Pushed to `master`
+
+- Update main.ts ([@JonAegis](https://github.com/JonAegis))
+- Simplify default parameter in pad function ([@JonAegis](https://github.com/JonAegis))
+- Update utils.ts ([@JonAegis](https://github.com/JonAegis))
+- Fix formatting of function parameters in resolvePathVariables ([@JonAegis](https://github.com/JonAegis))
+- feat:添加图片导出时目录支持变量设置 (jiaqiang.ding@nio.com)
+- Initial commit ([@bingryan](https://github.com/bingryan))
+
+#### Authors: 3
+
+- [@bingryan](https://github.com/bingryan)
+- jiaqiang.ding (jiaqiang.ding@nio.com)
+- Jonathan ([@JonAegis](https://github.com/JonAegis))
+
+---
+
 # 1.0.30 (Sun Sep 07 2025)
 
 #### 🐛 Bug Fix
