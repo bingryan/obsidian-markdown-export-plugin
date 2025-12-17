@@ -83,7 +83,7 @@ export default class MarkdownExportPlugin extends Plugin {
     }
     private async createFolderAndRun(
         file: TAbstractFile,
-        outputFormat: string
+        outputFormat: OUTPUT_FORMATS
     ) {
         // run
         await tryRun(this, file, outputFormat);
