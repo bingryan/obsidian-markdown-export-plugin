@@ -208,9 +208,9 @@ export async function tryCopyImage(
             .read(contentPath)
             .then(async (content) => {
                 const imageLinks = await getImageLinks(content);
-                // 获取 vault 名称用于变量替换
+                
                 const vaultName = plugin.app.vault.getName();
-                // 获取文件名（去掉扩展名）用于变量替换
+                
                 const fileNameWithoutExt = filename.replace(/\.[^/.]+$/, "");
                 
                 for (const index in imageLinks) {
@@ -246,7 +246,7 @@ export async function tryCopyImage(
                         continue;
                     }
 
-                    // 解析附件路径中的变量
+                    
                     const resolvedAttachPath = resolvePathVariables(
                         plugin.settings.attachment,
                         fileNameWithoutExt,
@@ -456,7 +456,7 @@ export async function tryCopyMarkdownByRead(
     try {
         await plugin.app.vault.adapter.read(file.path).then(async (content) => {
             const imageLinks = await getImageLinks(content);
-            // 解析变量（用于生成目录与链接）
+            
             const vaultName = plugin.app.vault.getName();
             const fileNameWithoutExt = file.name.replace(/\.[^/.]+$/, "");
             const resolvedAttachPath = resolvePathVariables(

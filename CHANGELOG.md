@@ -6,7 +6,7 @@
 - Simplify default parameter in pad function ([@JonAegis](https://github.com/JonAegis))
 - Update utils.ts ([@JonAegis](https://github.com/JonAegis))
 - Fix formatting of function parameters in resolvePathVariables ([@JonAegis](https://github.com/JonAegis))
-- feat:添加图片导出时目录支持变量设置 (jiaqiang.ding@nio.com)
+- feat:添加图片导出时目录支持变量设置 ([@JonAegis](https://github.com/JonAegis))
 - Initial commit ([@bingryan](https://github.com/bingryan))
 
 #### Authors: 3
