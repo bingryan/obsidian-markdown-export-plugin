@@ -89,12 +89,9 @@ export function resolvePathVariables(
     vaultName = ""
 ): string {
     const now = new Date();
-    
-    
     const pad = (num: number, len = 2) => String(num).padStart(len, "0");
-    
     const variables: Record<string, string> = {
-        fileName: fileName.replace(/\.[^/.]+$/, ""), 
+        fileName: fileName.replace(/\.[^/.]+$/, "").replace(/[/\\]/g, ""),
         date: `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`,
         time: `${pad(now.getHours())}-${pad(now.getMinutes())}-${pad(now.getSeconds())}`,
         datetime: `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}-${pad(now.getHours())}-${pad(now.getMinutes())}-${pad(now.getSeconds())}`,
@@ -107,12 +104,9 @@ export function resolvePathVariables(
         second: pad(now.getSeconds()),
         vaultName: vaultName,
     };
-    
-    
     let result = pathTemplate;
     for (const [key, value] of Object.entries(variables)) {
         result = result.replace(new RegExp(`{{${key}}}`, "g"), value);
     }
-    
     return result;
 }
