@@ -83,7 +83,7 @@ export default class MarkdownExportPlugin extends Plugin {
     }
     private async createFolderAndRun(
         file: TAbstractFile,
-        outputFormat: string
+        outputFormat: OUTPUT_FORMATS
     ) {
         // run
         await tryRun(this, file, outputFormat);
@@ -158,7 +158,9 @@ class MarkdownExportSettingTab extends PluginSettingTab {
 
         new Setting(containerEl)
             .setName("Attachment Path (optional)")
-            .setDesc("attachment path, relative to the output path")
+            .setDesc(
+                "attachment path, relative to the output path. Supports variables: {{fileName}}, {{date}}, {{time}}, {{datetime}}, {{timestamp}}, {{year}}, {{month}}, {{day}}, {{hour}}, {{minute}}, {{second}}, {{vaultName}}. Example: 'images/{{date}}' becomes 'images/2024-12-06'"
+            )
             .addText((text) =>
                 text
                     .setPlaceholder("Enter attachment path")

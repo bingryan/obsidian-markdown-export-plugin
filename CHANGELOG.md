@@ -2,11 +2,11 @@
 
 #### 🐛 Bug Fix
 
-- feat: add export to text [#110](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/110) ([@bingryan](https://github.com/bingryan))
+-   feat: add export to text [#110](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/110) ([@bingryan](https://github.com/bingryan))
 
 #### Authors: 1
 
-- [@bingryan](https://github.com/bingryan)
+-   [@bingryan](https://github.com/bingryan)
 
 ---
 
@@ -14,11 +14,11 @@
 
 #### 🐛 Bug Fix
 
-- refactor: MBED_URL_REGEXP [#104](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/104) ([@bingryan](https://github.com/bingryan))
+-   refactor: MBED_URL_REGEXP [#104](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/104) ([@bingryan](https://github.com/bingryan))
 
 #### Authors: 1
 
-- [@bingryan](https://github.com/bingryan)
+-   [@bingryan](https://github.com/bingryan)
 
 ---
 
@@ -26,11 +26,11 @@
 
 #### 🐛 Bug Fix
 
-- chore: add remove meta option [#103](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/103) ([@bingryan](https://github.com/bingryan))
+-   chore: add remove meta option [#103](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/103) ([@bingryan](https://github.com/bingryan))
 
 #### Authors: 1
 
-- [@bingryan](https://github.com/bingryan)
+-   [@bingryan](https://github.com/bingryan)
 
 ---
 
@@ -38,12 +38,12 @@
 
 #### 🐛 Bug Fix
 
-- feat: add wikilink to markdown link option [#102](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/102) ([@bingryan](https://github.com/bingryan))
-- style: indent_style -> space [#101](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/101) ([@bingryan](https://github.com/bingryan))
+-   feat: add wikilink to markdown link option [#102](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/102) ([@bingryan](https://github.com/bingryan))
+-   style: indent_style -> space [#101](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/101) ([@bingryan](https://github.com/bingryan))
 
 #### Authors: 1
 
-- [@bingryan](https://github.com/bingryan)
+-   [@bingryan](https://github.com/bingryan)
 
 ---
 
@@ -51,11 +51,11 @@
 
 #### 🐛 Bug Fix
 
-- Fixed broken attachment paths within exported markup [#98](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/98) ([@PersonMeetup](https://github.com/PersonMeetup))
+-   Fixed broken attachment paths within exported markup [#98](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/98) ([@PersonMeetup](https://github.com/PersonMeetup))
 
 #### Authors: 1
 
-- Leslie Swan ([@PersonMeetup](https://github.com/PersonMeetup))
+-   Leslie Swan ([@PersonMeetup](https://github.com/PersonMeetup))
 
 ---
 
@@ -63,11 +63,11 @@
 
 #### 🐛 Bug Fix
 
-- Added absolute attachment paths & expanded subdirectory support [#94](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/94) ([@PersonMeetup](https://github.com/PersonMeetup))
+-   Added absolute attachment paths & expanded subdirectory support [#94](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/94) ([@PersonMeetup](https://github.com/PersonMeetup))
 
 #### Authors: 1
 
-- Leslie Swan ([@PersonMeetup](https://github.com/PersonMeetup))
+-   Leslie Swan ([@PersonMeetup](https://github.com/PersonMeetup))
 
 ---
 
@@ -75,11 +75,11 @@
 
 #### 🐛 Bug Fix
 
-- fix re groups [#92](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/92) ([@bingryan](https://github.com/bingryan))
+-   fix re groups [#92](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/92) ([@bingryan](https://github.com/bingryan))
 
 #### Authors: 1
 
-- [@bingryan](https://github.com/bingryan)
+-   [@bingryan](https://github.com/bingryan)
 
 ---
 
@@ -87,11 +87,11 @@
 
 #### 🐛 Bug Fix
 
-- adding two new options, custom filename and filename in output dir [#86](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/86) ([@shindakun](https://github.com/shindakun))
+-   adding two new options, custom filename and filename in output dir [#86](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/86) ([@shindakun](https://github.com/shindakun))
 
 #### Authors: 1
 
-- Steve Layton ([@shindakun](https://github.com/shindakun))
+-   Steve Layton ([@shindakun](https://github.com/shindakun))
 
 ---
 
@@ -99,12 +99,12 @@
 
 #### 🐛 Bug Fix
 
-- fix: default config value [#88](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/88) ([@bingryan](https://github.com/bingryan))
-- docs: update readme [#87](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/87) ([@bingryan](https://github.com/bingryan))
+-   fix: default config value [#88](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/88) ([@bingryan](https://github.com/bingryan))
+-   docs: update readme [#87](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/87) ([@bingryan](https://github.com/bingryan))
 
 #### Authors: 1
 
-- [@bingryan](https://github.com/bingryan)
+-   [@bingryan](https://github.com/bingryan)
 
 ---
 
@@ -112,11 +112,11 @@
 
 #### 🐛 Bug Fix
 
-- feat: add displayImageAsHtml and removeOutgoingLinkBrackets options [#83](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/83) ([@bruce3x](https://github.com/bruce3x))
+-   feat: add displayImageAsHtml and removeOutgoingLinkBrackets options [#83](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/83) ([@bruce3x](https://github.com/bruce3x))
 
 #### Authors: 1
 
-- bruce3x ([@bruce3x](https://github.com/bruce3x))
+-   bruce3x ([@bruce3x](https://github.com/bruce3x))
 
 ---
 
@@ -124,14 +124,14 @@
 
 #### 🐛 Bug Fix
 
-- perf: bump version [#74](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/74) ([@bingryan](https://github.com/bingryan))
-- refactor: setting config [#73](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/73) ([@bingryan](https://github.com/bingryan))
-- feat: Add a option to keep attachment file name unchanged or use md5 of file name to rename(#68) [#72](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/72) ([@sxr1223](https://github.com/sxr1223))
+-   perf: bump version [#74](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/74) ([@bingryan](https://github.com/bingryan))
+-   refactor: setting config [#73](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/73) ([@bingryan](https://github.com/bingryan))
+-   feat: Add a option to keep attachment file name unchanged or use md5 of file name to rename(#68) [#72](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/72) ([@sxr1223](https://github.com/sxr1223))
 
 #### Authors: 2
 
-- [@bingryan](https://github.com/bingryan)
-- [@sxr1223](https://github.com/sxr1223)
+-   [@bingryan](https://github.com/bingryan)
+-   [@sxr1223](https://github.com/sxr1223)
 
 ---
 
@@ -139,12 +139,12 @@
 
 #### 🐛 Bug Fix
 
-- release: 1.0.18 [#70](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/70) ([@bingryan](https://github.com/bingryan))
-- feat: add fileNameEncode option [#69](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/69) ([@bingryan](https://github.com/bingryan))
+-   release: 1.0.18 [#70](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/70) ([@bingryan](https://github.com/bingryan))
+-   feat: add fileNameEncode option [#69](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/69) ([@bingryan](https://github.com/bingryan))
 
 #### Authors: 1
 
-- [@bingryan](https://github.com/bingryan)
+-   [@bingryan](https://github.com/bingryan)
 
 ---
 
@@ -152,11 +152,11 @@
 
 #### 🐛 Bug Fix
 
-- fix: plugin id [#67](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/67) ([@bingryan](https://github.com/bingryan))
+-   fix: plugin id [#67](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/67) ([@bingryan](https://github.com/bingryan))
 
 #### Authors: 1
 
-- [@bingryan](https://github.com/bingryan)
+-   [@bingryan](https://github.com/bingryan)
 
 ---
 
@@ -164,11 +164,11 @@
 
 #### 🐛 Bug Fix
 
-- refactor: rename manifest [#66](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/66) ([@bingryan](https://github.com/bingryan))
+-   refactor: rename manifest [#66](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/66) ([@bingryan](https://github.com/bingryan))
 
 #### Authors: 1
 
-- [@bingryan](https://github.com/bingryan)
+-   [@bingryan](https://github.com/bingryan)
 
 ---
 
@@ -176,12 +176,12 @@
 
 #### 🐛 Bug Fix
 
-- fix: windows absolute path export [#64](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/64) ([@bingryan](https://github.com/bingryan))
-- docs: update readme [#63](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/63) ([@bingryan](https://github.com/bingryan))
+-   fix: windows absolute path export [#64](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/64) ([@bingryan](https://github.com/bingryan))
+-   docs: update readme [#63](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/63) ([@bingryan](https://github.com/bingryan))
 
 #### Authors: 1
 
-- [@bingryan](https://github.com/bingryan)
+-   [@bingryan](https://github.com/bingryan)
 
 ---
 
@@ -189,11 +189,11 @@
 
 #### 🐛 Bug Fix
 
-- fix: windows path router [#62](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/62) ([@bingryan](https://github.com/bingryan))
+-   fix: windows path router [#62](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/62) ([@bingryan](https://github.com/bingryan))
 
 #### Authors: 1
 
-- [@bingryan](https://github.com/bingryan)
+-   [@bingryan](https://github.com/bingryan)
 
 ---
 
@@ -201,11 +201,11 @@
 
 #### 🐛 Bug Fix
 
-- fix: attachment  path [#58](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/58) ([@bingryan](https://github.com/bingryan))
+-   fix: attachment path [#58](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/58) ([@bingryan](https://github.com/bingryan))
 
 #### Authors: 1
 
-- [@bingryan](https://github.com/bingryan)
+-   [@bingryan](https://github.com/bingryan)
 
 ---
 
@@ -213,12 +213,12 @@
 
 #### 🐛 Bug Fix
 
-- feat: image path check image dimensions [#56](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/56) ([@bingryan](https://github.com/bingryan))
-- docs: update readme [#54](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/54) ([@bingryan](https://github.com/bingryan))
+-   feat: image path check image dimensions [#56](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/56) ([@bingryan](https://github.com/bingryan))
+-   docs: update readme [#54](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/54) ([@bingryan](https://github.com/bingryan))
 
 #### Authors: 1
 
-- [@bingryan](https://github.com/bingryan)
+-   [@bingryan](https://github.com/bingryan)
 
 ---
 
@@ -226,11 +226,11 @@
 
 #### 🐛 Bug Fix
 
-- feat: support set output outside of vault [#53](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/53) ([@bingryan](https://github.com/bingryan))
+-   feat: support set output outside of vault [#53](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/53) ([@bingryan](https://github.com/bingryan))
 
 #### Authors: 1
 
-- [@bingryan](https://github.com/bingryan)
+-   [@bingryan](https://github.com/bingryan)
 
 ---
 
@@ -238,11 +238,11 @@
 
 #### 🐛 Bug Fix
 
-- fix: name [#51](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/51) ([@bingryan](https://github.com/bingryan))
+-   fix: name [#51](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/51) ([@bingryan](https://github.com/bingryan))
 
 #### Authors: 1
 
-- [@bingryan](https://github.com/bingryan)
+-   [@bingryan](https://github.com/bingryan)
 
 ---
 
@@ -250,13 +250,13 @@
 
 #### 🐛 Bug Fix
 
-- Create Obsidian commands [#42](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/42) ([@Neykah](https://github.com/Neykah))
-- update readme [#40](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/40) ([@bingryan](https://github.com/bingryan))
+-   Create Obsidian commands [#42](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/42) ([@Neykah](https://github.com/Neykah))
+-   update readme [#40](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/40) ([@bingryan](https://github.com/bingryan))
 
 #### Authors: 2
 
-- [@bingryan](https://github.com/bingryan)
-- Morgan Lefranc ([@Neykah](https://github.com/Neykah))
+-   [@bingryan](https://github.com/bingryan)
+-   Morgan Lefranc ([@Neykah](https://github.com/Neykah))
 
 ---
 
@@ -264,11 +264,11 @@
 
 #### 🐛 Bug Fix
 
-- feat: add export html [#39](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/39) ([@bingryan](https://github.com/bingryan))
+-   feat: add export html [#39](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/39) ([@bingryan](https://github.com/bingryan))
 
 #### Authors: 1
 
-- [@bingryan](https://github.com/bingryan)
+-   [@bingryan](https://github.com/bingryan)
 
 ---
 
@@ -276,11 +276,11 @@
 
 #### 🐛 Bug Fix
 
-- fix: filter http link [#38](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/38) ([@bingryan](https://github.com/bingryan))
+-   fix: filter http link [#38](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/38) ([@bingryan](https://github.com/bingryan))
 
 #### Authors: 1
 
-- [@bingryan](https://github.com/bingryan)
+-   [@bingryan](https://github.com/bingryan)
 
 ---
 
@@ -288,11 +288,11 @@
 
 #### 🐛 Bug Fix
 
-- Call decodeURI before resolving paths [#35](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/35) ([@mnaoumov](https://github.com/mnaoumov))
+-   Call decodeURI before resolving paths [#35](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/35) ([@mnaoumov](https://github.com/mnaoumov))
 
 #### Authors: 1
 
-- Michael Naumov ([@mnaoumov](https://github.com/mnaoumov))
+-   Michael Naumov ([@mnaoumov](https://github.com/mnaoumov))
 
 ---
 
@@ -300,11 +300,11 @@
 
 #### 🐛 Bug Fix
 
-- add markdowm image link [#33](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/33) ([@bingryan](https://github.com/bingryan))
+-   add markdowm image link [#33](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/33) ([@bingryan](https://github.com/bingryan))
 
 #### Authors: 1
 
-- [@bingryan](https://github.com/bingryan)
+-   [@bingryan](https://github.com/bingryan)
 
 ---
 
@@ -312,11 +312,11 @@
 
 #### 🐛 Bug Fix
 
-- fix: setting error [#31](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/31) ([@bingryan](https://github.com/bingryan))
+-   fix: setting error [#31](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/31) ([@bingryan](https://github.com/bingryan))
 
 #### Authors: 1
 
-- [@bingryan](https://github.com/bingryan)
+-   [@bingryan](https://github.com/bingryan)
 
 ---
 
@@ -324,13 +324,13 @@
 
 #### 🐛 Bug Fix
 
-- fix: Images are not displayed correctly in the exported markdown docu… [#28](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/28) ([@martinniee](https://github.com/martinniee))
-- update readme [#24](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/24) ([@bingryan](https://github.com/bingryan))
+-   fix: Images are not displayed correctly in the exported markdown docu… [#28](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/28) ([@martinniee](https://github.com/martinniee))
+-   update readme [#24](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/24) ([@bingryan](https://github.com/bingryan))
 
 #### Authors: 2
 
-- [@bingryan](https://github.com/bingryan)
-- Nathanie ([@martinniee](https://github.com/martinniee))
+-   [@bingryan](https://github.com/bingryan)
+-   Nathanie ([@martinniee](https://github.com/martinniee))
 
 ---
 
@@ -338,21 +338,21 @@
 
 #### 🐛 Bug Fix
 
-- update workflow [#23](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/23) ([@bingryan](https://github.com/bingryan))
-- ci: add lint [#22](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/22) ([@bingryan](https://github.com/bingryan))
-- Fix non local attachment copy. [#21](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/21) ([@uroybd](https://github.com/uroybd))
-- Embed markdown in exported files [#13](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/13) ([@uroybd](https://github.com/uroybd))
-- update release workflow [#20](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/20) ([@bingryan](https://github.com/bingryan))
-- update release workflow [#19](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/19) ([@bingryan](https://github.com/bingryan))
-- update release workflow [#18](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/18) ([@bingryan](https://github.com/bingryan))
-- update release workflow [#17](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/17) ([@bingryan](https://github.com/bingryan))
-- update release workflow [#16](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/16) ([@bingryan](https://github.com/bingryan))
-- update ci permissions [#14](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/14) ([@bingryan](https://github.com/bingryan))
+-   update workflow [#23](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/23) ([@bingryan](https://github.com/bingryan))
+-   ci: add lint [#22](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/22) ([@bingryan](https://github.com/bingryan))
+-   Fix non local attachment copy. [#21](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/21) ([@uroybd](https://github.com/uroybd))
+-   Embed markdown in exported files [#13](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/13) ([@uroybd](https://github.com/uroybd))
+-   update release workflow [#20](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/20) ([@bingryan](https://github.com/bingryan))
+-   update release workflow [#19](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/19) ([@bingryan](https://github.com/bingryan))
+-   update release workflow [#18](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/18) ([@bingryan](https://github.com/bingryan))
+-   update release workflow [#17](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/17) ([@bingryan](https://github.com/bingryan))
+-   update release workflow [#16](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/16) ([@bingryan](https://github.com/bingryan))
+-   update ci permissions [#14](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/14) ([@bingryan](https://github.com/bingryan))
 
 #### Authors: 2
 
-- [@bingryan](https://github.com/bingryan)
-- Utsob Roy ([@uroybd](https://github.com/uroybd))
+-   [@bingryan](https://github.com/bingryan)
+-   Utsob Roy ([@uroybd](https://github.com/uroybd))
 
 ---
 
@@ -360,14 +360,14 @@
 
 #### 🐛 Bug Fix
 
-- Docs/readme [#11](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/11) ([@bingryan](https://github.com/bingryan))
-- docs: update feat [#10](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/10) ([@bingryan](https://github.com/bingryan))
-- feat: add fold export [#9](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/9) ([@bingryan](https://github.com/bingryan))
-- update release.yml workflow [#8](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/8) ([@bingryan](https://github.com/bingryan))
+-   Docs/readme [#11](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/11) ([@bingryan](https://github.com/bingryan))
+-   docs: update feat [#10](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/10) ([@bingryan](https://github.com/bingryan))
+-   feat: add fold export [#9](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/9) ([@bingryan](https://github.com/bingryan))
+-   update release.yml workflow [#8](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/8) ([@bingryan](https://github.com/bingryan))
 
 #### Authors: 1
 
-- [@bingryan](https://github.com/bingryan)
+-   [@bingryan](https://github.com/bingryan)
 
 ---
 
@@ -375,18 +375,18 @@
 
 #### 🐛 Bug Fix
 
-- release 1.0.0 [#7](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/7) ([@bingryan](https://github.com/bingryan))
-- release: 1.0.0 [#6](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/6) ([@bingryan](https://github.com/bingryan))
-- docs: update readme [#5](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/5) ([@bingryan](https://github.com/bingryan))
-- fix:fire:remove unnecessary code [#4](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/4) ([@bingryan](https://github.com/bingryan))
-- add GitHub Flavored Markdown option [#3](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/3) ([@bingryan](https://github.com/bingryan))
-- add export single markdown logic [#2](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/2) ([@bingryan](https://github.com/bingryan))
-- set up  base UI [#1](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/1) ([@bingryan](https://github.com/bingryan))
+-   release 1.0.0 [#7](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/7) ([@bingryan](https://github.com/bingryan))
+-   release: 1.0.0 [#6](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/6) ([@bingryan](https://github.com/bingryan))
+-   docs: update readme [#5](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/5) ([@bingryan](https://github.com/bingryan))
+-   fix:fire:remove unnecessary code [#4](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/4) ([@bingryan](https://github.com/bingryan))
+-   add GitHub Flavored Markdown option [#3](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/3) ([@bingryan](https://github.com/bingryan))
+-   add export single markdown logic [#2](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/2) ([@bingryan](https://github.com/bingryan))
+-   set up base UI [#1](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/1) ([@bingryan](https://github.com/bingryan))
 
 #### ⚠️ Pushed to `master`
 
-- Initial commit ([@bingryan](https://github.com/bingryan))
+-   Initial commit ([@bingryan](https://github.com/bingryan))
 
 #### Authors: 1
 
-- [@bingryan](https://github.com/bingryan)
+-   [@bingryan](https://github.com/bingryan)

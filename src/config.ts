@@ -61,3 +61,52 @@ export const DEFAULT_SETTINGS: MarkdownExportPluginSettings = {
     textExportCheckboxUnchecked: "☐",
     textExportCheckboxChecked: "☑"
 };
+
+/**
+ * Resolves path template variables
+ * Supported variables:
+ * {{fileName}} - file name (without extension)
+ * {{date}} - current date (YYYY-MM-DD)
+ * {{time}} - current time (HH-mm-ss)
+ * {{datetime}} - full date-time (YYYY-MM-DD-HH-mm-ss)
+ * {{timestamp}} - Unix timestamp
+ * {{year}} - year (YYYY)
+ * {{month}} - month (MM)
+ * {{day}} - day (DD)
+ * {{hour}} - hour (HH)
+ * {{minute}} - minute (mm)
+ * {{second}} - second (ss)
+ * {{vaultName}} - vault name
+ * 
+ * Examples:
+ * - "images/{{date}}" → "images/2024-12-06"
+ * - "{{fileName}}/images" → "my-note/images"
+ * - "attachments/{{year}}/{{month}}" → "attachments/2024/12"
+ */
+export function resolvePathVariables(
+    pathTemplate: string,
+    fileName = "",
+    vaultName = ""
+): string {
+    const now = new Date();
+    const pad = (num: number, len = 2) => String(num).padStart(len, "0");
+    const variables: Record<string, string> = {
+        fileName: fileName.replace(/\.[^/.]+$/, "").replace(/[/\\]/g, ""),
+        date: `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`,
+        time: `${pad(now.getHours())}-${pad(now.getMinutes())}-${pad(now.getSeconds())}`,
+        datetime: `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}-${pad(now.getHours())}-${pad(now.getMinutes())}-${pad(now.getSeconds())}`,
+        timestamp: String(now.getTime()),
+        year: String(now.getFullYear()),
+        month: pad(now.getMonth() + 1),
+        day: pad(now.getDate()),
+        hour: pad(now.getHours()),
+        minute: pad(now.getMinutes()),
+        second: pad(now.getSeconds()),
+        vaultName: vaultName,
+    };
+    let result = pathTemplate;
+    for (const [key, value] of Object.entries(variables)) {
+        result = result.replace(new RegExp(`{{${key}}}`, "g"), value);
+    }
+    return result;
+}
