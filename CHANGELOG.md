@@ -1,3 +1,17 @@
+# 1.0.31 (Tue Dec 23 2025)
+
+#### 🐛 Bug Fix
+
+- feat:添加图片导出时目录支持变量设置 [#115](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/115) (jiaqiang.ding@nio.com [@JonAegis](https://github.com/JonAegis) [@bingryan](https://github.com/bingryan))
+
+#### Authors: 3
+
+- [@bingryan](https://github.com/bingryan)
+- jiaqiang.ding (jiaqiang.ding@nio.com)
+- Jonathan ([@JonAegis](https://github.com/JonAegis))
+
+---
+
 # 1.0.30 (Sun Sep 07 2025)
 
 #### 🐛 Bug Fix
