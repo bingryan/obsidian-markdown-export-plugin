@@ -2,6 +2,7 @@ import {
     App,
     Menu,
     MenuItem,
+    Modal,
     Notice,
     Plugin,
     PluginSettingTab,
@@ -16,7 +17,102 @@ import {
     DEFAULT_SETTINGS,
     OUTPUT_FORMATS,
 } from "./config";
-import { tryRun } from "./utils";
+import { tryRun, tryRunBatch, getFilesWithTag } from "./utils";
+
+class TagInputModal extends Modal {
+    private onSubmit: (tag: string) => void;
+    private inputEl: HTMLInputElement;
+    private errorEl: HTMLElement;
+
+    constructor(app: App, onSubmit: (tag: string) => void) {
+        super(app);
+        this.onSubmit = onSubmit;
+    }
+
+    onOpen() {
+        const { contentEl } = this;
+        contentEl.createEl("h2", { text: "Export notes by tag" });
+
+        contentEl.createEl("p", {
+            text: "Enter the tag to export (e.g. 'blog' or '#blog')",
+        });
+
+        const inputContainer = contentEl.createDiv();
+        this.inputEl = inputContainer.createEl("input", {
+            type: "text",
+            placeholder: "blog",
+        });
+        this.inputEl.style.width = "100%";
+        this.inputEl.style.padding = "8px";
+        this.inputEl.style.marginTop = "10px";
+
+        // Error message element (hidden by default)
+        this.errorEl = contentEl.createEl("p", {
+            text: "Please enter a tag",
+            cls: "mod-warning",
+        });
+        this.errorEl.style.marginTop = "10px";
+        this.errorEl.style.display = "none";
+
+        const buttonContainer = contentEl.createDiv({
+            cls: "modal-button-container",
+        });
+        buttonContainer.style.marginTop = "20px";
+        buttonContainer.style.display = "flex";
+        buttonContainer.style.justifyContent = "flex-end";
+        buttonContainer.style.gap = "10px";
+
+        const cancelButton = buttonContainer.createEl("button", {
+            text: "Cancel",
+            cls: "mod-cancel",
+        });
+        cancelButton.addEventListener("click", () => this.close());
+
+        const submitButton = buttonContainer.createEl("button", {
+            text: "Export",
+            cls: "mod-cta",
+        });
+        submitButton.addEventListener("click", () => {
+            const tag = this.inputEl.value.trim();
+            if (tag) {
+                this.errorEl.style.display = "none";
+                this.onSubmit(tag);
+                this.close();
+            } else {
+                this.errorEl.style.display = "block";
+            }
+        });
+
+        // Allow Enter key to submit
+        this.inputEl.addEventListener("keypress", (e) => {
+            if (e.key === "Enter") {
+                const tag = this.inputEl.value.trim();
+                if (tag) {
+                    this.errorEl.style.display = "none";
+                    this.onSubmit(tag);
+                    this.close();
+                } else {
+                    this.errorEl.style.display = "block";
+                }
+            }
+        });
+
+        // Hide error when user starts typing
+        this.inputEl.addEventListener("input", () => {
+            if (this.inputEl.value.trim()) {
+                this.errorEl.style.display = "none";
+            }
+        });
+
+        // Focus input on open
+        setTimeout(() => this.inputEl.focus(), 10);
+    }
+
+    onClose() {
+        const { contentEl } = this;
+        contentEl.empty();
+    }
+}
 
 export default class MarkdownExportPlugin extends Plugin {
     settings: MarkdownExportPluginSettings;
@@ -64,6 +160,53 @@ export default class MarkdownExportPlugin extends Plugin {
                 },
             });
         }
+
+        // Add tag-based export commands
+        for (const outputFormat of [
+            OUTPUT_FORMATS.MD,
+            OUTPUT_FORMATS.HTML,
+            OUTPUT_FORMATS.TEXT,
+        ]) {
+            this.addCommand({
+                id: "export-by-tag-to-" + outputFormat,
+                name: `Export notes by tag to ${outputFormat}`,
+                callback: async () => {
+                    this.exportByTag(outputFormat);
+                },
+            });
+        }
+    }
+
+    /**
+     * Export notes that contain a specific tag
+     * @param outputFormat - The output format (MD, HTML, or TEXT)
+     */
+    async exportByTag(outputFormat: OUTPUT_FORMATS) {
+        new TagInputModal(this.app, async (tag) => {
+            const trimmedTag = tag.trim();
+            const files = getFilesWithTag(this, trimmedTag);
+
+            if (files.length === 0) {
+                new Notice(`No files found with tag '${trimmedTag}'`);
+                return;
+            }
+
+            new Notice(`Exporting ${files.length} file(s) with tag '${trimmedTag}' to ${outputFormat}...`);
+
+            const result = await tryRunBatch(this, files, outputFormat);
+
+            if (result.failed === 0) {
+                new Notice(`Successfully exported ${result.success} file(s) with tag '${trimmedTag}' to ${outputFormat}`);
+            } else {
+                new Notice(
+                    `Exported ${result.success} file(s), ${result.failed} failed. Check console for details.`
+                );
+                // Log all errors to console for debugging
+                for (const error of result.errors) {
+                    console.error(error);
+                }
+            }
+        }).open();
     }
 
     registerDirMenu(menu: Menu, file: TAbstractFile) {
