@@ -1,3 +1,15 @@
+# 1.0.32 (Fri Jan 02 2026)
+
+#### 🐛 Bug Fix
+
+- feat: add tag-based export functionality (fixes #107) [#117](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/117) ([@bingryan](https://github.com/bingryan))
+
+#### Authors: 1
+
+- [@bingryan](https://github.com/bingryan)
+
+---
+
 # 1.0.31 (Tue Dec 23 2025)
 
 #### 🐛 Bug Fix
