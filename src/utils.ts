@@ -1,7 +1,7 @@
 import * as path from "path";
 import * as fs from "fs";
 import md5 from "md5";
-import { TAbstractFile, TFile, TFolder, htmlToMarkdown } from "obsidian";
+import { TAbstractFile, TFile, TFolder, htmlToMarkdown, CachedMetadata } from "obsidian";
 
 import {
     ATTACHMENT_URL_REGEXP,
@@ -33,6 +33,100 @@ export async function getImageLinks(markdown: string) {
 export async function getEmbeds(markdown: string) {
     const embeds = markdown.matchAll(EMBED_URL_REGEXP);
     return Array.from(embeds);
+}
+
+/**
+ * Get all markdown files that contain a specific tag
+ * @param plugin - The plugin instance
+ * @param tag - The tag to search for (can be with or without # prefix)
+ * @returns Array of TFile objects that contain the tag
+ */
+export function getFilesWithTag(
+    plugin: MarkdownExportPlugin,
+    tag: string
+): TFile[] {
+    // Normalize tag - ensure it starts with #
+    const normalizedTag = tag.startsWith("#") ? tag : `#${tag}`;
+    const filesWithTag: TFile[] = [];
+
+    // Iterate through all markdown files in the vault
+    const markdownFiles = plugin.app.vault.getMarkdownFiles();
+
+    for (const file of markdownFiles) {
+        const cache = plugin.app.metadataCache.getFileCache(file);
+
+        if (cache) {
+            // Check if the file has the tag in its frontmatter or inline tags
+            if (hasTag(cache, normalizedTag)) {
+                filesWithTag.push(file);
+            }
+        }
+    }
+
+    return filesWithTag;
+}
+
+/**
+ * Check if a file's metadata contains a specific tag
+ * Supports nested tag matching (e.g., '#blog' matches '#blog/2024')
+ * @param cache - The cached metadata for a file
+ * @param tag - The tag to search for (with # prefix)
+ * @returns True if the file contains the tag
+ */
+function hasTag(cache: CachedMetadata, tag: string): boolean {
+    // Check frontmatter tags
+    if (cache.frontmatter && cache.frontmatter.tags) {
+        const frontmatterTags = cache.frontmatter.tags;
+        if (Array.isArray(frontmatterTags)) {
+            for (const t of frontmatterTags) {
+                if (typeof t === "string" && tagsMatch(t, tag)) {
+                    return true;
+                }
+            }
+        } else if (typeof frontmatterTags === "string") {
+            const tags = frontmatterTags.split(",").map((t: string) => t.trim());
+            for (const t of tags) {
+                if (tagsMatch(t, tag)) {
+                    return true;
+                }
+            }
+        }
+    }
+
+    // Check inline tags (tags in the body of the document)
+    if (cache.tags) {
+        for (const tagObj of cache.tags) {
+            if (tagObj.tag && tagsMatch(tagObj.tag, tag)) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+/**
+ * Check if two tags match, supporting nested tag matching
+ * @param fileTag - The tag from the file (with or without #)
+ * @param searchTag - The tag to search for (always with #)
+ * @returns True if the tags match
+ */
+function tagsMatch(fileTag: string, searchTag: string): boolean {
+    // Normalize file tag to ensure it starts with #
+    const normalizedFileTag = fileTag.startsWith("#") ? fileTag : `#${fileTag}`;
+
+    // Exact match
+    if (normalizedFileTag === searchTag) {
+        return true;
+    }
+
+    // Nested tag matching: if searching for '#blog', match '#blog/2024'
+    // But not the other way around: searching for '#blog/2024' should NOT match '#blog'
+    if (normalizedFileTag.startsWith(searchTag + "/")) {
+        return true;
+    }
+
+    return false;
 }
 
 // get all markdown parameters
@@ -106,6 +200,38 @@ export async function tryRun(
             throw error;
         }
     }
+}
+
+/**
+ * Export multiple files to a specific output format
+ * @param plugin - The plugin instance
+ * @param files - Array of files to export
+ * @param outputFormat - The output format (MD, HTML, or TEXT)
+ * @returns Object with success and failure counts
+ */
+export async function tryRunBatch(
+    plugin: MarkdownExportPlugin,
+    files: TFile[],
+    outputFormat = OUTPUT_FORMATS.MD
+): Promise<{ success: number; failed: number; errors: string[] }> {
+    const result = { success: 0, failed: 0, errors: [] as string[] };
+
+    for (const file of files) {
+        try {
+            const params = allMarkdownParams(file, [], outputFormat, ".");
+            for (const param of params) {
+                await tryCopyMarkdownByRead(plugin, param);
+            }
+            result.success++;
+        } catch (error) {
+            result.failed++;
+            const errorMsg = `Failed to export ${file.path}: ${error.message}`;
+            result.errors.push(errorMsg);
+            console.error(errorMsg);
+        }
+    }
+
+    return result;
 }
 
 export function getResourceOsPath(
