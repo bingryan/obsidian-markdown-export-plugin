@@ -706,10 +706,13 @@ export async function tryCopyMarkdownByRead(
                 const embeds = await getEmbeds(content);
                 for (const index in embeds) {
                     const url = embeds[index][1];
-                    content = content.replace(
-                        embeds[index][0],
-                        embedMap.get(url)
-                    );
+                    const replacement = embedMap.get(url);
+                    if (replacement !== undefined) {
+                        content = content.replace(
+                            embeds[index][0],
+                            replacement
+                        );
+                    }
                 }
             }
 
