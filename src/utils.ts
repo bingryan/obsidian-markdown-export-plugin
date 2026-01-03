@@ -479,6 +479,114 @@ export async function getEmbedMap(
     return embedMap;
 }
 
+/**
+ * Extract block content from a file using block reference ID
+ */
+async function getBlockContent(
+    plugin: MarkdownExportPlugin,
+    filePath: string,
+    blockId: string
+): Promise<string | null> {
+    try {
+        // Get the file metadata
+        const file = plugin.app.vault.getAbstractFileByPath(filePath);
+        if (!(file instanceof TFile)) {
+            return null;
+        }
+
+        // Read file content and get metadata
+        const content = await plugin.app.vault.cachedRead(file);
+        const metadata = plugin.app.metadataCache.getFileCache(file);
+
+        if (!metadata || !metadata.blocks) {
+            return null;
+        }
+
+        // Find the block by ID
+        const block = metadata.blocks[blockId];
+        if (!block) {
+            return null;
+        }
+
+        // Extract the block content from the file
+        const lines = content.split("\n");
+        const startLine = block.position.start.line;
+        const endLine = block.position.end.line;
+
+        if (startLine >= lines.length) {
+            return null;
+        }
+
+        const blockLines = lines.slice(startLine, endLine + 1);
+        let blockContent = blockLines.join("\n");
+
+        // Remove the block ID from the content if present at the end
+        blockContent = blockContent.replace(/\s*\^([a-zA-Z0-9]+)\s*$/, "");
+
+        return blockContent;
+    } catch (error) {
+        console.error("Error getting block content:", error);
+        return null;
+    }
+}
+
+/**
+ * Parse embed link to extract file path and block reference
+ * Examples:
+ * - "My Note#^abc123" -> { filePath: "My Note.md", blockId: "abc123" }
+ * - "#^abc123" -> { filePath: null, blockId: "abc123" }
+ * - "My Note" -> { filePath: "My Note.md", blockId: null }
+ */
+function parseEmbedLink(embedLink: string, currentPath: string): {
+    filePath: string | null;
+    blockId: string | null;
+    heading: string | null;
+} {
+    const blockMatch = embedLink.match(/^(.*?)#?\^([a-zA-Z0-9]+)$/);
+    if (blockMatch) {
+        const [, filePart, blockId] = blockMatch;
+        let filePath = filePart;
+        if (filePart && filePart.trim()) {
+            // Resolve relative path
+            const currentDir = currentPath.substring(0, currentPath.lastIndexOf("/"));
+            filePath = currentDir ? `${currentDir}/${filePart}` : filePart;
+            if (!filePath.endsWith(".md")) {
+                filePath += ".md";
+            }
+        } else {
+            filePath = currentPath;
+        }
+        return { filePath, blockId, heading: null };
+    }
+
+    // Check for heading link
+    const headingMatch = embedLink.match(/^(.*?)#([^#]+)$/);
+    if (headingMatch) {
+        const [, filePart, heading] = headingMatch;
+        let filePath = filePart || currentPath;
+        if (filePart && filePart.trim()) {
+            const currentDir = currentPath.substring(0, currentPath.lastIndexOf("/"));
+            filePath = currentDir ? `${currentDir}/${filePart}` : filePart;
+            if (!filePath.endsWith(".md")) {
+                filePath += ".md";
+            }
+        }
+        return { filePath, blockId: null, heading };
+    }
+
+    // Regular file link
+    if (embedLink.trim()) {
+        const currentDir = currentPath.substring(0, currentPath.lastIndexOf("/"));
+        let filePath = currentDir ? `${currentDir}/${embedLink}` : embedLink;
+        if (!filePath.endsWith(".md")) {
+            filePath += ".md";
+        }
+        return { filePath, blockId: null, heading: null };
+    }
+
+    return { filePath: null, blockId: null, heading: null };
+}
+
 // Convert Markdown to plain text with specific formatting
 export function convertMarkdownToText(
     plugin: MarkdownExportPlugin,
@@ -690,6 +798,43 @@ export async function tryCopyMarkdownByRead(
                 content = content.replaceAll(OUTGOING_LINK_REGEXP, "$1");
             }
 
+            // Process embeds BEFORE converting WikiLinks to Markdown
+            // This ensures block embeds like ![[#^blockid]] are handled correctly
+            const cfile = plugin.app.workspace.getActiveFile();
+            if (cfile != undefined) {
+                const embedMap = await getEmbedMap(plugin, content, cfile.path);
+                const embeds = await getEmbeds(content);
+                for (const index in embeds) {
+                    const embedMatch = embeds[index];
+                    const fullMatch = embedMatch[0];
+                    const embedLink = embedMatch[1];
+
+                    let replacement = embedMap.get(embedLink);
+
+                    // If not in embedMap and inlineBlockEmbeds is enabled, try to extract block content
+                    if (replacement === undefined && plugin.settings.inlineBlockEmbeds) {
+                        const parsed = parseEmbedLink(embedLink, cfile.path);
+                        if (parsed.blockId && parsed.filePath) {
+                            const blockContent = await getBlockContent(
+                                plugin,
+                                parsed.filePath,
+                                parsed.blockId
+                            );
+                            if (blockContent !== null) {
+                                // Format block content as quote block
+                                replacement = "> " + blockContent.replace(/\n/g, "\n> ");
+                            }
+                        }
+                    }
+
+                    // Only replace if we found a replacement
+                    // This prevents replacing with "undefined"
+                    if (replacement !== undefined) {
+                        content = content.replace(fullMatch, replacement);
+                    }
+                }
+            }
+
             if (plugin.settings.convertWikiLinksToMarkdown) {
                 content = content.replace(
                     /\[\[(.*?)\]\]/g,
@@ -698,22 +843,6 @@ export async function tryCopyMarkdownByRead(
                         return `[${linkText}](${encodedLink})`;
                     }
                 );
-            }
-
-            const cfile = plugin.app.workspace.getActiveFile();
-            if (cfile != undefined) {
-                const embedMap = await getEmbedMap(plugin, content, cfile.path);
-                const embeds = await getEmbeds(content);
-                for (const index in embeds) {
-                    const url = embeds[index][1];
-                    const replacement = embedMap.get(url);
-                    if (replacement !== undefined) {
-                        content = content.replace(
-                            embeds[index][0],
-                            replacement
-                        );
-                    }
-                }
             }
 
             await tryCopyImage(plugin, file.name, file.path);
