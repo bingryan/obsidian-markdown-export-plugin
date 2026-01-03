@@ -355,7 +355,7 @@ export async function tryCopyImage(
                     const fileName = path.parse(path.basename(imageLink)).name;
                     const imageLinkMd5 = plugin.settings.fileNameEncode
                         ? md5(imageLink)
-                        : fileName;
+                        : encodeURI(fileName);
                     const imageExt = path.extname(imageLink);
                     const ifile = plugin.app.metadataCache.getFirstLinkpathDest(
                         imageLink,
@@ -393,6 +393,12 @@ export async function tryCopyImage(
                             imageLinkMd5.concat(imageExt)
                         )
                         .replace(/\\/g, "/");
+
+                    // Skip if source and target are the same (prevents file corruption)
+                    // This can happen when an attachment is already in the output folder
+                    if (filePath === targetPath) {
+                        continue;
+                    }
 
                     try {
                         if (!fileExists(targetPath)) {
