@@ -1,3 +1,15 @@
+# 1.0.34 (Sat Jan 03 2026)
+
+#### 🐛 Bug Fix
+
+- fix: add inline block embeds support to fix #114 [#119](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/119) ([@bingryan](https://github.com/bingryan))
+
+#### Authors: 1
+
+- [@bingryan](https://github.com/bingryan)
+
+---
+
 # 1.0.33 (Sat Jan 03 2026)
 
 #### 🐛 Bug Fix
