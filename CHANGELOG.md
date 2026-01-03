@@ -1,3 +1,15 @@
+# 1.0.35 (Sat Jan 03 2026)
+
+#### 🐛 Bug Fix
+
+- fix: support percentage sizes in wiki link images (#111) [#120](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/120) ([@bingryan](https://github.com/bingryan))
+
+#### Authors: 1
+
+- [@bingryan](https://github.com/bingryan)
+
+---
+
 # 1.0.34 (Sat Jan 03 2026)
 
 #### 🐛 Bug Fix
