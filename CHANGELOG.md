@@ -1,3 +1,15 @@
+# 1.0.36 (Sat Jan 03 2026)
+
+#### 🐛 Bug Fix
+
+- fix: resolve attachment export inconsistencies (#108) [#121](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/121) ([@bingryan](https://github.com/bingryan))
+
+#### Authors: 1
+
+- [@bingryan](https://github.com/bingryan)
+
+---
+
 # 1.0.35 (Sat Jan 03 2026)
 
 #### 🐛 Bug Fix
