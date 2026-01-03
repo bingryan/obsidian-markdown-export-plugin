@@ -1,7 +1,7 @@
 import * as path from "path";
 import * as fs from "fs";
 import md5 from "md5";
-import { TAbstractFile, TFile, TFolder, htmlToMarkdown, CachedMetadata } from "obsidian";
+import { TAbstractFile, TFile, TFolder, CachedMetadata } from "obsidian";
 
 import {
     ATTACHMENT_URL_REGEXP,
@@ -449,38 +449,159 @@ export async function tryCopyMarkdown(
     }
 }
 
+/**
+ * Extract heading content from a file (from heading to next heading of same or higher level)
+ */
+async function getHeadingContent(
+    plugin: MarkdownExportPlugin,
+    filePath: string,
+    heading: string
+): Promise<string | null> {
+    try {
+        const file = plugin.app.vault.getAbstractFileByPath(filePath);
+        if (!(file instanceof TFile)) {
+            return null;
+        }
+
+        const content = await plugin.app.vault.cachedRead(file);
+        const lines = content.split("\n");
+
+        // Normalize heading for comparison (remove # and spaces, lowercase)
+        const normalizedTarget = heading.toLowerCase().trim();
+
+        // Find the heading line
+        let startIndex = -1;
+        let headingLevel = 0;
+
+        for (let i = 0; i < lines.length; i++) {
+            const headingMatch = lines[i].match(/^(#{1,6})\s+(.+)$/);
+            if (headingMatch) {
+                const level = headingMatch[1].length;
+                const text = headingMatch[2].toLowerCase().trim();
+
+                if (text === normalizedTarget) {
+                    startIndex = i;
+                    headingLevel = level;
+                    break;
+                }
+            }
+        }
+
+        if (startIndex === -1) {
+            return null;
+        }
+
+        // Find the end (next heading of same or higher level, or end of file)
+        let endIndex = lines.length;
+        for (let i = startIndex + 1; i < lines.length; i++) {
+            const nextHeadingMatch = lines[i].match(/^(#{1,6})\s/);
+            if (nextHeadingMatch) {
+                const nextLevel = nextHeadingMatch[1].length;
+                if (nextLevel <= headingLevel) {
+                    endIndex = i;
+                    break;
+                }
+            }
+        }
+
+        const headingLines = lines.slice(startIndex, endIndex);
+        return headingLines.join("\n");
+    } catch (error) {
+        console.error("Error getting heading content:", error);
+        return null;
+    }
+}
+
+/**
+ * Get embed content by reading raw markdown from the source file
+ * This preserves code blocks (like mermaid) in their original format
+ */
+async function getEmbedContentFromSource(
+    plugin: MarkdownExportPlugin,
+    embedLink: string,
+    currentPath: string
+): Promise<string | null> {
+    const parsed = parseEmbedLink(embedLink, currentPath);
+
+    if (!parsed.filePath) {
+        return null;
+    }
+
+    try {
+        const file = plugin.app.vault.getAbstractFileByPath(parsed.filePath);
+        if (!(file instanceof TFile)) {
+            return null;
+        }
+
+        let content = await plugin.app.vault.cachedRead(file);
+
+        // Extract specific section if needed
+        if (parsed.blockId) {
+            const blockContent = await getBlockContent(
+                plugin,
+                parsed.filePath,
+                parsed.blockId
+            );
+            // Remove YAML header if configured (in case block is at start of file)
+            if (plugin.settings.removeYamlHeader && blockContent) {
+                return blockContent.replace(EMBED_METADATA_REGEXP, "");
+            }
+            return blockContent;
+        }
+
+        if (parsed.heading) {
+            const headingContent = await getHeadingContent(
+                plugin,
+                parsed.filePath,
+                parsed.heading
+            );
+            // Remove YAML header if configured (in case heading is at start of file)
+            if (plugin.settings.removeYamlHeader && headingContent) {
+                return headingContent.replace(EMBED_METADATA_REGEXP, "");
+            }
+            return headingContent;
+        }
+
+        // Remove YAML header if configured for full file content
+        if (plugin.settings.removeYamlHeader) {
+            content = content.replace(EMBED_METADATA_REGEXP, "");
+        }
+
+        return content;
+    } catch (error) {
+        console.error("Error getting embed content from source:", error);
+        return null;
+    }
+}
+
 export async function getEmbedMap(
     plugin: MarkdownExportPlugin,
     content: string,
     path: string
 ) {
-    // key：link url
-    // value： embed content parse from html document
     const embedMap = new Map();
-    const embedList = Array.from(
-        document.documentElement.getElementsByClassName("internal-embed")
-    );
+    const embeds = await getEmbeds(content);
 
-    Array.from(embedList).forEach((el) => {
-        // markdown-embed-content markdown-embed-page
-        const embedContentHtml = el.getElementsByClassName(
-            "markdown-embed-content"
-        )[0];
+    for (const embedMatch of embeds) {
+        const embedLink = embedMatch[1];
 
-        if (embedContentHtml) {
-            let embedValue = htmlToMarkdown(embedContentHtml.innerHTML);
-            if (plugin.settings.removeYamlHeader) {
-                embedValue = embedValue.replace(EMBED_METADATA_REGEXP, "");
-            }
-            embedValue =
+        // Try to get content from raw markdown source
+        const rawContent = await getEmbedContentFromSource(
+            plugin,
+            embedLink,
+            path
+        );
+
+        if (rawContent !== null) {
+            // Format as quote block
+            const embedValue =
                 "> " +
-                (embedValue as string)
+                rawContent
                     .replaceAll("# \n\n", "# ")
                     .replaceAll("\n", "\n> ");
-            const embedKey = el.getAttribute("src");
-            embedMap.set(embedKey, embedValue);
+            embedMap.set(embedLink, embedValue);
         }
-    });
+    }
 
     return embedMap;
 }
