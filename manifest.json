@@ -1,7 +1,7 @@
 {
   "id": "obsidian-markdown-export-plugin",
   "name": "markdown export",
-  "version": "1.0.35",
+  "version": "1.0.36",
   "minAppVersion": "0.15.0",
   "description": "This is a markdown export plugin for Obsidian.",
   "author": "bingryan",
