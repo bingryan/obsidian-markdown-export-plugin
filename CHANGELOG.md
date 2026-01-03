@@ -1,3 +1,15 @@
+# 1.0.37 (Sat Jan 03 2026)
+
+#### 🐛 Bug Fix
+
+- fix: preserve code blocks in embedded markdown files (fixes #106) [#122](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/122) ([@bingryan](https://github.com/bingryan))
+
+#### Authors: 1
+
+- [@bingryan](https://github.com/bingryan)
+
+---
+
 # 1.0.36 (Sat Jan 03 2026)
 
 #### 🐛 Bug Fix
