@@ -771,13 +771,18 @@ export async function tryCopyMarkdownByRead(
                 if (plugin.settings.displayImageAsHtml) {
                     const { width = null, height = null } =
                         imageLinks[index]?.groups || {};
+                    // Helper to format size value - append 'px' only if not a percentage
+                    const formatSize = (value: string | null) => {
+                        if (!value) return "";
+                        return value.includes("%") ? value : `${value}px`;
+                    };
                     const style =
                         width && height
-                            ? ` style='width: {${width}}px; height: ${height}px;'`
+                            ? ` style='width: ${formatSize(width)}; height: ${formatSize(height)};'`
                             : width
-                            ? ` style='width: ${width}px;'`
+                            ? ` style='width: ${formatSize(width)};'`
                             : height
-                            ? ` style='height: ${height}px;'`
+                            ? ` style='height: ${formatSize(height)};'`
                             : "";
 
                     content = content.replace(
