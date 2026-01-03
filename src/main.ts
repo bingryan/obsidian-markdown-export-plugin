@@ -439,6 +439,20 @@ class MarkdownExportSettingTab extends PluginSettingTab {
                     })
             );
         new Setting(containerEl)
+            .setName("Inline Block Embeds")
+            .setDesc(
+                "If enabled, block embeds like ![[#^blockid]] will be replaced with the actual block content. " +
+                "If disabled, block embeds will be preserved as-is (may not work in exported markdown)."
+            )
+            .addToggle((toggle) =>
+                toggle
+                    .setValue(this.plugin.settings.inlineBlockEmbeds)
+                    .onChange(async (value: boolean) => {
+                        this.plugin.settings.inlineBlockEmbeds = value;
+                        await this.plugin.saveSettings();
+                    })
+            );
+        new Setting(containerEl)
             .setName("Remove YAML Metadata Header")
             .setDesc(
                 "If enabled, the YAML metadata header will be removed from embedded files when exporting."
