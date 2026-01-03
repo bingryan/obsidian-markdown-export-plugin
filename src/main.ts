@@ -453,6 +453,20 @@ class MarkdownExportSettingTab extends PluginSettingTab {
                     })
             );
         new Setting(containerEl)
+            .setName("Export Embed Content")
+            .setDesc(
+                "If enabled, embedded files like ![[note.md]] will be expanded with their actual content when exporting. " +
+                "If disabled, embeds will be preserved as ![[...]] links in the exported file."
+            )
+            .addToggle((toggle) =>
+                toggle
+                    .setValue(this.plugin.settings.exportEmbedContent)
+                    .onChange(async (value: boolean) => {
+                        this.plugin.settings.exportEmbedContent = value;
+                        await this.plugin.saveSettings();
+                    })
+            );
+        new Setting(containerEl)
             .setName("Remove YAML Metadata Header")
             .setDesc(
                 "If enabled, the YAML metadata header will be removed from embedded files when exporting."

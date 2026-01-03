@@ -33,6 +33,7 @@ export interface MarkdownExportPluginSettings {
     removeYamlHeader: boolean;
     // Block embed settings
     inlineBlockEmbeds: boolean;
+    exportEmbedContent: boolean;
     // Text export settings
     textExportBulletPointMap: Record<number, string>;
     textExportCheckboxUnchecked: string;
@@ -54,6 +55,7 @@ export const DEFAULT_SETTINGS: MarkdownExportPluginSettings = {
     removeYamlHeader: false,
     // Block embed settings
     inlineBlockEmbeds: false,
+    exportEmbedContent: true,
     // Text export settings
     textExportBulletPointMap: {
         0: "●",

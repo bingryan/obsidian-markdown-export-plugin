@@ -486,6 +486,89 @@ export async function getEmbedMap(
 }
 
 /**
+ * Get embed content by reading file directly from vault
+ * This is a fallback method when DOM-based embed extraction fails
+ */
+export async function getEmbedContentFromFile(
+    plugin: MarkdownExportPlugin,
+    embedLink: string,
+    currentPath: string
+): Promise<string | null> {
+    try {
+        const parsed = parseEmbedLink(embedLink, currentPath);
+        
+        if (!parsed.filePath) {
+            return null;
+        }
+
+        // Get the file from vault
+        const file = plugin.app.vault.getAbstractFileByPath(parsed.filePath);
+        if (!(file instanceof TFile)) {
+            return null;
+        }
+
+        // Read file content
+        let embedContent = await plugin.app.vault.cachedRead(file);
+
+        // If there's a heading reference, extract that section
+        if (parsed.heading) {
+            embedContent = extractHeadingSection(embedContent, parsed.heading);
+        } else if (parsed.blockId) {
+            // If there's a block reference, extract that block
+            const blockContent = await getBlockContent(plugin, parsed.filePath, parsed.blockId);
+            if (blockContent !== null) {
+                embedContent = blockContent;
+            }
+        } else {
+            // Remove YAML header if configured
+            if (plugin.settings.removeYamlHeader) {
+                embedContent = embedContent.replace(EMBED_METADATA_REGEXP, "");
+            }
+        }
+
+        // Format as quote block
+        return "> " + embedContent.trim().replaceAll("\n", "\n> ");
+    } catch (error) {
+        console.error("Error getting embed content from file:", error);
+        return null;
+    }
+}
+
+/**
+ * Extract a specific section from markdown content based on heading
+ */
+function extractHeadingSection(content: string, heading: string): string {
+    const lines = content.split("\n");
+    const startLine = lines.findIndex(line => {
+        const match = line.match(/^(#{1,6})\s+(.*)$/);
+        if (match) {
+            const headingText = match[2].trim().toLowerCase();
+            return headingText === heading.toLowerCase();
+        }
+        return false;
+    });
+
+    if (startLine === -1) {
+        return content;
+    }
+
+    // Find the end of this section (next heading of same or higher level)
+    const startHeadingMatch = lines[startLine].match(/^(#{1,6})/);
+    const startLevel = startHeadingMatch ? startHeadingMatch[1].length : 1;
+
+    let endLine = lines.length;
+    for (let i = startLine + 1; i < lines.length; i++) {
+        const match = lines[i].match(/^(#{1,6})\s+/);
+        if (match && match[1].length <= startLevel) {
+            endLine = i;
+            break;
+        }
+    }
+
+    return lines.slice(startLine, endLine).join("\n");
+}
+
+/**
  * Extract block content from a file using block reference ID
  */
 async function getBlockContent(
@@ -811,10 +894,19 @@ export async function tryCopyMarkdownByRead(
 
             // Process embeds BEFORE converting WikiLinks to Markdown
             // This ensures block embeds like ![[#^blockid]] are handled correctly
-            const cfile = plugin.app.workspace.getActiveFile();
-            if (cfile != undefined) {
-                const embedMap = await getEmbedMap(plugin, content, cfile.path);
+            if (plugin.settings.exportEmbedContent) {
                 const embeds = await getEmbeds(content);
+                
+                // First, try to get embeds from DOM (if current file is active)
+                const cfile = plugin.app.workspace.getActiveFile();
+                let embedMap = new Map();
+                
+                if (cfile != undefined && cfile.path === file.path) {
+                    // Only use DOM-based extraction if exporting the active file
+                    embedMap = await getEmbedMap(plugin, content, cfile.path);
+                }
+                
+                // Process each embed
                 for (const index in embeds) {
                     const embedMatch = embeds[index];
                     const fullMatch = embedMatch[0];
@@ -822,9 +914,14 @@ export async function tryCopyMarkdownByRead(
 
                     let replacement = embedMap.get(embedLink);
 
-                    // If not in embedMap and inlineBlockEmbeds is enabled, try to extract block content
+                    // If not in embedMap, try to get content directly from file
+                    if (replacement === undefined) {
+                        replacement = await getEmbedContentFromFile(plugin, embedLink, file.path);
+                    }
+
+                    // If still not found and inlineBlockEmbeds is enabled, try to extract block content
                     if (replacement === undefined && plugin.settings.inlineBlockEmbeds) {
-                        const parsed = parseEmbedLink(embedLink, cfile.path);
+                        const parsed = parseEmbedLink(embedLink, file.path);
                         if (parsed.blockId && parsed.filePath) {
                             const blockContent = await getBlockContent(
                                 plugin,
