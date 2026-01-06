@@ -932,38 +932,37 @@ export async function tryCopyMarkdownByRead(
 
             // Process embeds BEFORE converting WikiLinks to Markdown
             // This ensures block embeds like ![[#^blockid]] are handled correctly
-            const cfile = plugin.app.workspace.getActiveFile();
-            if (cfile != undefined) {
-                const embedMap = await getEmbedMap(plugin, content, cfile.path);
-                const embeds = await getEmbeds(content);
-                for (const index in embeds) {
-                    const embedMatch = embeds[index];
-                    const fullMatch = embedMatch[0];
-                    const embedLink = embedMatch[1];
+            // Use the file being exported instead of getActiveFile() to avoid issues
+            // when the active file changes during async processing or is undefined
+            const embedMap = await getEmbedMap(plugin, content, file.path);
+            const embeds = await getEmbeds(content);
+            for (const index in embeds) {
+                const embedMatch = embeds[index];
+                const fullMatch = embedMatch[0];
+                const embedLink = embedMatch[1];
 
-                    let replacement = embedMap.get(embedLink);
+                let replacement = embedMap.get(embedLink);
 
-                    // If not in embedMap and inlineBlockEmbeds is enabled, try to extract block content
-                    if (replacement === undefined && plugin.settings.inlineBlockEmbeds) {
-                        const parsed = parseEmbedLink(embedLink, cfile.path);
-                        if (parsed.blockId && parsed.filePath) {
-                            const blockContent = await getBlockContent(
-                                plugin,
-                                parsed.filePath,
-                                parsed.blockId
-                            );
-                            if (blockContent !== null) {
-                                // Format block content as quote block
-                                replacement = "> " + blockContent.replace(/\n/g, "\n> ");
-                            }
+                // If not in embedMap and inlineBlockEmbeds is enabled, try to extract block content
+                if (replacement === undefined && plugin.settings.inlineBlockEmbeds) {
+                    const parsed = parseEmbedLink(embedLink, file.path);
+                    if (parsed.blockId && parsed.filePath) {
+                        const blockContent = await getBlockContent(
+                            plugin,
+                            parsed.filePath,
+                            parsed.blockId
+                        );
+                        if (blockContent !== null) {
+                            // Format block content as quote block
+                            replacement = "> " + blockContent.replace(/\n/g, "\n> ");
                         }
                     }
+                }
 
-                    // Only replace if we found a replacement
-                    // This prevents replacing with "undefined"
-                    if (replacement !== undefined) {
-                        content = content.replace(fullMatch, replacement);
-                    }
+                // Only replace if we found a replacement
+                // This prevents replacing with "undefined"
+                if (replacement !== undefined) {
+                    content = content.replace(fullMatch, replacement);
                 }
             }
 
