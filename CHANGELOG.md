@@ -1,3 +1,28 @@
+# 1.0.38 (Tue Jan 06 2026)
+
+### Release Notes
+
+#### fix: use file parameter instead of getActiveFile() for embed processing ([#123](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/123))
+
+* **Bug Fixes**
+  * Fixed embed resolution during file export to correctly use the file being exported instead of relying on the active editor file, ensuring embeds are properly resolved and replaced regardless of which file is currently open.
+
+<sub>✏️ Tip: You can customize this high-level summary in your review settings.</sub>
+
+<!-- end of auto-generated comment: release notes by coderabbit.ai -->
+
+---
+
+#### 🐛 Bug Fix
+
+- fix: use file parameter instead of getActiveFile() for embed processing [#123](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/123) ([@bingryan](https://github.com/bingryan))
+
+#### Authors: 1
+
+- [@bingryan](https://github.com/bingryan)
+
+---
+
 # 1.0.37 (Sat Jan 03 2026)
 
 #### 🐛 Bug Fix
