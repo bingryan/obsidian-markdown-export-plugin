@@ -10,7 +10,7 @@ export const EMBED_METADATA_REGEXP =
 
 export const GFM_IMAGE_FORMAT = "![]({0})";
 
-export const OUTGOING_LINK_REGEXP = /(?<!!)\[\[(.*?)\]\]/g;
+export const OUTGOING_LINK_REGEXP = /(?<!!)\[\[(?:[^|\]]*\|)?([^\]]+)\]\]/g;
 
 export enum OUTPUT_FORMATS {
     MD = "Markdown",
