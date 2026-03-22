@@ -1,3 +1,15 @@
+# 1.0.39 (Sun Mar 22 2026)
+
+#### 🐛 Bug Fix
+
+- Pipe syntax for outgoing links [#125](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/125) ([@Nicendredi](https://github.com/Nicendredi))
+
+#### Authors: 1
+
+- Nicolas Endredi ([@Nicendredi](https://github.com/Nicendredi))
+
+---
+
 # 1.0.38 (Tue Jan 06 2026)
 
 ### Release Notes
