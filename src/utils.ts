@@ -344,18 +344,18 @@ export async function tryCopyImage(
                         imageLinks[index][7 - imageLinks[index].length];
 
                     // decode and replace the relative path
-                    let imageLink = decodeURI(urlEncodedImageLink).replace(
-                        /\.\.\//g,
-                        ""
-                    );
-                    if (imageLink.contains("|")) {
-                        imageLink = imageLink.split("|")[0];
+                    let imageLink = "";
+                    try {
+                        imageLink = decodeURIComponent(urlEncodedImageLink).replace(/\.\.\//g, "");
+                    } catch (e) {
+                        console.warn(`Unable to decode URI: ${urlEncodedImageLink}`);
+                        imageLink = urlEncodedImageLink.replace(/\.\.\//g, "");
                     }
 
                     const fileName = path.parse(path.basename(imageLink)).name;
                     const imageLinkMd5 = plugin.settings.fileNameEncode
                         ? md5(imageLink)
-                        : encodeURI(fileName);
+                        : fileName;
                     const imageExt = path.extname(imageLink);
                     const ifile = plugin.app.metadataCache.getFirstLinkpathDest(
                         imageLink,
@@ -857,10 +857,13 @@ export async function tryCopyMarkdownByRead(
                     imageLinks[index][7 - imageLinks[index].length];
 
                 // decode and replace the relative path
-                let imageLink = decodeURI(urlEncodedImageLink).replace(
-                    /\.\.\//g,
-                    ""
-                );
+                let imageLink = "";
+                try {
+                    imageLink = decodeURIComponent(urlEncodedImageLink).replace(/\.\.\//g, "");
+                } catch (e) {
+                    console.warn(`Unable to decode URI: ${urlEncodedImageLink}`);
+                    imageLink = urlEncodedImageLink.replace(/\.\.\//g, "");
+                }
                 // link: https://help.obsidian.md/Linking+notes+and+files/Embedding+files#Embed+an+image+in+a+note
                 // issue: #44 -> figure checkout: ![[name|figure]]
                 if (imageLink.contains("|")) {
@@ -869,7 +872,7 @@ export async function tryCopyMarkdownByRead(
                 const fileName = path.parse(path.basename(imageLink)).name;
                 const imageLinkMd5 = plugin.settings.fileNameEncode
                     ? md5(imageLink)
-                    : encodeURI(fileName);
+                    : fileName;
                 const imageExt = path.extname(imageLink);
                 // Unify the link separator in obsidian as a forward slash instead of the default back slash in windows, so that the referenced images can be displayed properly
 
