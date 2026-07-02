@@ -1,3 +1,15 @@
+# 1.0.40 (Thu Jul 02 2026)
+
+#### 🐛 Bug Fix
+
+- fix: remove encodeURI for image links [#128](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/128) ([@Lamply](https://github.com/Lamply))
+
+#### Authors: 1
+
+- Lamply ([@Lamply](https://github.com/Lamply))
+
+---
+
 # 1.0.39 (Sun Mar 22 2026)
 
 #### 🐛 Bug Fix
