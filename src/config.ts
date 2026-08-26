@@ -1,5 +1,5 @@
 export const ATTACHMENT_URL_REGEXP =
-    /!\[\[((.*?)\.(\w+))(?:\s*\|\s*[^\]]*)?\]\]/g;
+    /!\[\[((.*?)\.(\w+))(?:\s*(?<metadata>(?:\|(?<width>\d+%?)(?:[*|x](?<height>\d+%?))?|\|[^\]]*|#[^\]]*)))?\]\]/g;
 
 export const MARKDOWN_ATTACHMENT_URL_REGEXP = /!\[(.*?)\]\(((.*?)\.(\w+))\)/g;
 

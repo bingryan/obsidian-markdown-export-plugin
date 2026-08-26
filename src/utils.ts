@@ -22,12 +22,30 @@ type CopyMarkdownOptions = {
     outputSubPath: string;
 };
 
+type ImageLink = {
+    rawImageLink: string;
+    imageLink: string;
+    metadata: string;
+    width?: string;
+    height?: string;
+};
+
 export async function getImageLinks(markdown: string) {
     const imageLinks = markdown.matchAll(ATTACHMENT_URL_REGEXP);
     const markdownImageLinks = markdown.matchAll(
         MARKDOWN_ATTACHMENT_URL_REGEXP
     );
-    return Array.from(imageLinks).concat(Array.from(markdownImageLinks));
+    return Array.from(imageLinks)
+        .concat(Array.from(markdownImageLinks))
+        .map((match): ImageLink => ({
+            rawImageLink: match[0],
+            imageLink: match[0].startsWith("![[") ? match[1] : match[2],
+            metadata: match[0].startsWith("![[")
+                ? match.groups?.metadata || ""
+                : "",
+            width: match.groups?.width,
+            height: match.groups?.height,
+        }));
 }
 
 export async function getEmbeds(markdown: string) {
@@ -340,8 +358,7 @@ export async function tryCopyImage(
                 const fileNameWithoutExt = filename.replace(/\.[^/.]+$/, "");
                 
                 for (const index in imageLinks) {
-                    const urlEncodedImageLink =
-                        imageLinks[index][7 - imageLinks[index].length];
+                    const urlEncodedImageLink = imageLinks[index].imageLink;
 
                     // decode and replace the relative path
                     let imageLink = "";
@@ -361,10 +378,15 @@ export async function tryCopyImage(
                         imageLink,
                         contentPath
                     );
+                    const imageFile =
+                        ifile ||
+                        plugin.app.vault.getAbstractFileByPath(
+                            path.join(path.dirname(contentPath), imageLink)
+                        );
 
                     const filePath =
-                        ifile !== null
-                            ? ifile.path
+                        imageFile !== null
+                            ? imageFile.path
                             : path.join(path.dirname(contentPath), imageLink);
 
                     // filter markdown link eg: http://xxx.png
@@ -408,7 +430,7 @@ export async function tryCopyImage(
                             ) {
                                 const resourceOsPath = getResourceOsPath(
                                     plugin,
-                                    ifile
+                                    imageFile instanceof TFile ? imageFile : null
                                 );
                                 fs.copyFileSync(resourceOsPath, targetPath);
                             } else {
@@ -851,10 +873,9 @@ export async function tryCopyMarkdownByRead(
             }
 
             for (const index in imageLinks) {
-                const rawImageLink = imageLinks[index][0];
-
-                const urlEncodedImageLink =
-                    imageLinks[index][7 - imageLinks[index].length];
+                const rawImageLink = imageLinks[index].rawImageLink;
+                const urlEncodedImageLink = imageLinks[index].imageLink;
+                const imageMetadata = imageLinks[index].metadata;
 
                 // decode and replace the relative path
                 let imageLink = "";
@@ -899,8 +920,7 @@ export async function tryCopyMarkdownByRead(
                 }
 
                 if (plugin.settings.displayImageAsHtml) {
-                    const { width = null, height = null } =
-                        imageLinks[index]?.groups || {};
+                    const { width = null, height = null } = imageLinks[index];
                     // Helper to format size value - append 'px' only if not a percentage
                     const formatSize = (value: string | null) => {
                         if (!value) return "";
@@ -922,7 +942,7 @@ export async function tryCopyMarkdownByRead(
                 } else if (plugin.settings.GFM) {
                     content = content.replace(
                         rawImageLink,
-                        GFM_IMAGE_FORMAT.format(hashLink)
+                        GFM_IMAGE_FORMAT.format(hashLink + imageMetadata)
                     );
                 } else {
                     content = content.replace(urlEncodedImageLink, hashLink);
