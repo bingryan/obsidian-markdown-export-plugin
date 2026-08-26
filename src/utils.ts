@@ -43,8 +43,8 @@ export async function getImageLinks(markdown: string) {
             metadata: match[0].startsWith("![[")
                 ? match.groups?.metadata || ""
                 : "",
-            width: match.groups?.width,
-            height: match.groups?.height,
+            width: match.groups?.width || match.groups?.escapedWidth,
+            height: match.groups?.height || match.groups?.escapedHeight,
         }));
 }
 
