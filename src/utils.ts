@@ -941,6 +941,14 @@ export async function tryCopyMarkdownByRead(
                         rawImageLink,
                         `<img src="${hashLink}"${style} />`
                     );
+                } else if (
+                    plugin.settings.convertWikiLinksToMarkdown &&
+                    rawImageLink.startsWith("![[")
+                ) {
+                    content = content.replace(
+                        rawImageLink,
+                        GFM_IMAGE_FORMAT.format(hashLink)
+                    );
                 } else if (plugin.settings.GFM) {
                     content = content.replace(
                         rawImageLink,
