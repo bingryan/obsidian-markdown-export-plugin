@@ -875,7 +875,9 @@ export async function tryCopyMarkdownByRead(
             for (const index in imageLinks) {
                 const rawImageLink = imageLinks[index].rawImageLink;
                 const urlEncodedImageLink = imageLinks[index].imageLink;
-                const imageMetadata = imageLinks[index].metadata;
+                const imageMetadata = plugin.settings.GFM
+                    ? ""
+                    : imageLinks[index].metadata;
 
                 // decode and replace the relative path
                 let imageLink = "";
@@ -945,7 +947,12 @@ export async function tryCopyMarkdownByRead(
                         GFM_IMAGE_FORMAT.format(hashLink + imageMetadata)
                     );
                 } else {
-                    content = content.replace(urlEncodedImageLink, hashLink);
+                    content = content.replace(
+                        rawImageLink,
+                        rawImageLink.startsWith("![[")
+                            ? `![[${hashLink}${imageMetadata}]]`
+                            : rawImageLink.replace(urlEncodedImageLink, hashLink)
+                    );
                 }
             }
 
