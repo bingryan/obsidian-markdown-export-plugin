@@ -1,3 +1,15 @@
+# 1.0.41 (Sun Aug 30 2026)
+
+#### 🐛 Bug Fix
+
+- Fixes images with Metadata [#130](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/130) ([@fabsch225](https://github.com/fabsch225))
+
+#### Authors: 1
+
+- Fabian Schuller ([@fabsch225](https://github.com/fabsch225))
+
+---
+
 # 1.0.40 (Thu Jul 02 2026)
 
 #### 🐛 Bug Fix
