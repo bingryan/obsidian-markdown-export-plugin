@@ -8,6 +8,7 @@ import {
     MARKDOWN_ATTACHMENT_URL_REGEXP,
     EMBED_URL_REGEXP,
     EMBED_METADATA_REGEXP,
+    LineBreakMode,
     OUTGOING_LINK_REGEXP,
     OUTPUT_FORMATS,
     replaceAllLiteral,
@@ -51,6 +52,99 @@ export async function getImageLinks(markdown: string) {
 export async function getEmbeds(markdown: string) {
     const embeds = markdown.matchAll(EMBED_URL_REGEXP);
     return Array.from(embeds);
+}
+
+/**
+ * Marks lines that must stay untouched by line-break conversion: YAML front
+ * matter, fenced code blocks and `$$` math blocks.
+ */
+function getVerbatimLines(lines: string[]): boolean[] {
+    const verbatim = new Array<boolean>(lines.length).fill(false);
+    let index = 0;
+
+    if (lines.length > 0 && lines[0].trim() === "---") {
+        verbatim[0] = true;
+        for (index = 1; index < lines.length; index++) {
+            verbatim[index] = true;
+            if (lines[index].trim() === "---") {
+                index++;
+                break;
+            }
+        }
+    }
+
+    let fence: string | null = null;
+    let mathBlock = false;
+    for (; index < lines.length; index++) {
+        const trimmed = lines[index].trim();
+        if (fence !== null) {
+            verbatim[index] = true;
+            if (trimmed.startsWith(fence) && trimmed.replace(/[`~]/g, "") === "") {
+                fence = null;
+            }
+            continue;
+        }
+        if (mathBlock) {
+            verbatim[index] = true;
+            if (trimmed === "$$") {
+                mathBlock = false;
+            }
+            continue;
+        }
+        const fenceMatch = trimmed.match(/^(`{3,}|~{3,})/);
+        if (fenceMatch) {
+            fence = fenceMatch[1];
+            verbatim[index] = true;
+        } else if (trimmed === "$$") {
+            mathBlock = true;
+            verbatim[index] = true;
+        }
+    }
+
+    return verbatim;
+}
+
+/**
+ * Obsidian renders a single newline inside a paragraph as a line break, plain
+ * Markdown renderers do not. Insert `<br>` or a trailing backslash on every
+ * soft break so the exported file keeps the breaks. Front matter, code blocks,
+ * math blocks and tables are left as they are.
+ */
+export function convertSoftLineBreaks(
+    markdown: string,
+    mode: Exclude<LineBreakMode, "off">
+): string {
+    const lines = markdown.split("\n");
+    const verbatim = getVerbatimLines(lines);
+    const result: string[] = [];
+
+    for (let index = 0; index < lines.length; index++) {
+        const line = lines[index];
+        const next = lines[index + 1];
+        const isSoftBreak =
+            next !== undefined &&
+            line.trim() !== "" &&
+            next.trim() !== "" &&
+            !verbatim[index] &&
+            !verbatim[index + 1] &&
+            !line.includes("|") &&
+            !next.includes("|") &&
+            !/^\s*#{1,6}\s/.test(line) &&
+            !/^\s*#{1,6}\s/.test(next) &&
+            !/^\s*([-=*_]\s*){3,}$/.test(line) &&
+            !/^\s*([-=*_]\s*){3,}$/.test(next) &&
+            !/(\\|<br\s*\/?>| {2,})$/.test(line);
+
+        if (!isSoftBreak) {
+            result.push(line);
+        } else if (mode === "br") {
+            result.push(`${line}<br>`);
+        } else {
+            result.push(`${line.trimEnd()}\\`);
+        }
+    }
+
+    return result.join("\n");
 }
 
 /**
@@ -1092,7 +1186,14 @@ export async function tryCopyMarkdownByRead(
                         filename = file.name;
                     }
                     const targetFile = path.join(outDir, filename);
-                    await tryCreate(plugin, targetFile, content);
+                    const markdownContent =
+                        plugin.settings.lineBreakMode === "off"
+                            ? content
+                            : convertSoftLineBreaks(
+                                  content,
+                                  plugin.settings.lineBreakMode
+                              );
+                    await tryCreate(plugin, targetFile, markdownContent);
                     break;
                 }
                 case OUTPUT_FORMATS.TEXT: {

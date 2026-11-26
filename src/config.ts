@@ -16,6 +16,8 @@ export enum OUTPUT_FORMATS {
     TEXT = "Text",
 }
 
+export type LineBreakMode = "off" | "br" | "backslash";
+
 export interface MarkdownExportPluginSettings {
     output: string;
     attachment: string;
@@ -29,6 +31,8 @@ export interface MarkdownExportPluginSettings {
     relAttachPath: boolean;
     convertWikiLinksToMarkdown: boolean;
     removeYamlHeader: boolean;
+    // Single line breaks are rendered by Obsidian but not by plain Markdown
+    lineBreakMode: LineBreakMode;
     // Block embed settings
     inlineBlockEmbeds: boolean;
     // Text export settings
@@ -50,6 +54,7 @@ export const DEFAULT_SETTINGS: MarkdownExportPluginSettings = {
     relAttachPath: true,
     convertWikiLinksToMarkdown: false,
     removeYamlHeader: false,
+    lineBreakMode: "off",
     // Block embed settings
     inlineBlockEmbeds: false,
     // Text export settings
