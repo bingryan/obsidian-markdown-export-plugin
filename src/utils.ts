@@ -54,6 +54,19 @@ export async function getEmbeds(markdown: string) {
 }
 
 /**
+ * Percent-encodes a path so it is a valid Markdown/HTML link target.
+ * Spaces, `#`, `?` and `%` in attachment folders or file names would otherwise
+ * break the link. Path separators are kept; each segment is encoded on its own.
+ * Wiki links `![[...]]` must keep the literal path and are not encoded.
+ */
+export function encodeLinkPath(link: string): string {
+    return link
+        .split("/")
+        .map((segment) => encodeURIComponent(segment))
+        .join("/");
+}
+
+/**
  * Get all markdown files that contain a specific tag
  * @param plugin - The plugin instance
  * @param tag - The tag to search for (can be with or without # prefix)
@@ -920,6 +933,7 @@ export async function tryCopyMarkdownByRead(
                 const hashLink = path
                     .join(clickSubRoute, baseAttachPath, imageLinkMd5.concat(imageExt))
                     .replace(/\\/g, "/");
+                const encodedHashLink = encodeLinkPath(hashLink);
 
                 // filter markdown link eg: http://xxx.png
                 if (urlEncodedImageLink.startsWith("http")) {
@@ -945,7 +959,7 @@ export async function tryCopyMarkdownByRead(
                     content = replaceAllLiteral(
                         content,
                         rawImageLink,
-                        `<img src="${hashLink}"${style} />`
+                        `<img src="${encodedHashLink}"${style} />`
                     );
                 } else if (
                     plugin.settings.convertWikiLinksToMarkdown &&
@@ -954,13 +968,13 @@ export async function tryCopyMarkdownByRead(
                     content = replaceAllLiteral(
                         content,
                         rawImageLink,
-                        `![](${hashLink})`
+                        `![](${encodedHashLink})`
                     );
                 } else if (plugin.settings.GFM) {
                     content = replaceAllLiteral(
                         content,
                         rawImageLink,
-                        `![](${hashLink}${imageMetadata})`
+                        `![](${encodedHashLink}${imageMetadata})`
                     );
                 } else {
                     content = replaceAllLiteral(
@@ -971,7 +985,7 @@ export async function tryCopyMarkdownByRead(
                             : replaceAllLiteral(
                                   rawImageLink,
                                   urlEncodedImageLink,
-                                  hashLink
+                                  encodedHashLink
                               )
                     );
                 }
