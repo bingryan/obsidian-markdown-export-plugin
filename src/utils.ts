@@ -1,7 +1,13 @@
 import * as path from "path";
 import * as fs from "fs";
 import md5 from "md5";
-import { TAbstractFile, TFile, TFolder, CachedMetadata } from "obsidian";
+import {
+    CachedMetadata,
+    Notice,
+    TAbstractFile,
+    TFile,
+    TFolder,
+} from "obsidian";
 
 import {
     ATTACHMENT_URL_REGEXP,
@@ -642,6 +648,43 @@ async function getHeadingContent(
 }
 
 /**
+ * Resolve an embed link to a vault file the way Obsidian does: first by
+ * linkpath through the metadata cache (works for bare names, vault-wide
+ * paths and `#heading` / `#^blockid` suffixes), then by the relative path
+ * built from the note's directory as a fallback.
+ */
+function resolveEmbedFile(
+    plugin: MarkdownExportPlugin,
+    embedLink: string,
+    filePath: string,
+    currentPath: string
+): TFile | null {
+    const linkpath = embedLink.split("#")[0].trim();
+    if (linkpath) {
+        const cached = plugin.app.metadataCache.getFirstLinkpathDest(
+            linkpath,
+            currentPath
+        );
+        if (cached instanceof TFile) {
+            return cached;
+        }
+    }
+
+    const direct = plugin.app.vault.getAbstractFileByPath(filePath);
+    return direct instanceof TFile ? direct : null;
+}
+
+/**
+ * Whether an embed points at a note (and should therefore be inlined) rather
+ * than at an attachment such as `![[image.png]]`.
+ */
+function isNoteEmbedLink(embedLink: string): boolean {
+    const linkpath = embedLink.split("#")[0].trim();
+    const extension = path.extname(linkpath).toLowerCase();
+    return extension === "" || extension === ".md";
+}
+
+/**
  * Get embed content by reading raw markdown from the source file
  * This preserves code blocks (like mermaid) in their original format
  */
@@ -657,8 +700,13 @@ async function getEmbedContentFromSource(
     }
 
     try {
-        const file = plugin.app.vault.getAbstractFileByPath(parsed.filePath);
-        if (!(file instanceof TFile)) {
+        const file = resolveEmbedFile(
+            plugin,
+            embedLink,
+            parsed.filePath,
+            currentPath
+        );
+        if (!file || file.extension !== "md") {
             return null;
         }
 
@@ -668,7 +716,7 @@ async function getEmbedContentFromSource(
         if (parsed.blockId) {
             const blockContent = await getBlockContent(
                 plugin,
-                parsed.filePath,
+                file.path,
                 parsed.blockId
             );
             // Remove YAML header if configured (in case block is at start of file)
@@ -681,7 +729,7 @@ async function getEmbedContentFromSource(
         if (parsed.heading) {
             const headingContent = await getHeadingContent(
                 plugin,
-                parsed.filePath,
+                file.path,
                 parsed.heading
             );
             // Remove YAML header if configured (in case heading is at start of file)
@@ -1099,6 +1147,7 @@ export async function tryCopyMarkdownByRead(
             // may contain its own `![[...]]` text, which must not be scanned again.
             let contentWithEmbeds = "";
             let copiedUpTo = 0;
+            const unresolvedEmbeds: string[] = [];
             for (const embedMatch of embeds) {
                 const fullMatch = embedMatch[0];
                 const embedLink = embedMatch[1];
@@ -1110,11 +1159,20 @@ export async function tryCopyMarkdownByRead(
                 if (replacement === undefined && plugin.settings.inlineBlockEmbeds) {
                     const parsed = parseEmbedLink(embedLink, file.path);
                     if (parsed.blockId && parsed.filePath) {
-                        const blockContent = await getBlockContent(
+                        const blockFile = resolveEmbedFile(
                             plugin,
+                            embedLink,
                             parsed.filePath,
-                            parsed.blockId
+                            file.path
                         );
+                        const blockContent =
+                            blockFile !== null && blockFile.extension === "md"
+                                ? await getBlockContent(
+                                      plugin,
+                                      blockFile.path,
+                                      parsed.blockId
+                                  )
+                                : null;
                         if (blockContent !== null) {
                             // Format block content as quote block
                             replacement = "> " + blockContent.replace(/\n/g, "\n> ");
@@ -1128,9 +1186,27 @@ export async function tryCopyMarkdownByRead(
                     contentWithEmbeds +=
                         content.slice(copiedUpTo, matchStart) + replacement;
                     copiedUpTo = matchStart + fullMatch.length;
+                } else if (isNoteEmbedLink(embedLink)) {
+                    // A note embed that stayed as `![[...]]` in the output
+                    unresolvedEmbeds.push(fullMatch);
                 }
             }
             content = contentWithEmbeds + content.slice(copiedUpTo);
+
+            if (unresolvedEmbeds.length > 0) {
+                const preview = unresolvedEmbeds.slice(0, 3).join(", ");
+                const rest =
+                    unresolvedEmbeds.length > 3
+                        ? ` (+${unresolvedEmbeds.length - 3} more)`
+                        : "";
+                console.warn(
+                    `Markdown Export: could not inline ${unresolvedEmbeds.length} embed(s) in ${file.path}: ${unresolvedEmbeds.join(", ")}`
+                );
+                new Notice(
+                    `Markdown Export: ${unresolvedEmbeds.length} embed(s) in ${file.name} could not be inlined, left as-is: ${preview}${rest}`,
+                    8000
+                );
+            }
 
             if (plugin.settings.convertWikiLinksToMarkdown) {
                 content = content.replace(
