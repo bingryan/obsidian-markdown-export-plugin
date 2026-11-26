@@ -8,8 +8,6 @@ export const EMBED_URL_REGEXP = /!\[\[([\s\S]*?)\]\]/g;
 export const EMBED_METADATA_REGEXP =
     /^---(?:\n|\r\n)[\s\S]*?(?:\n|\r\n)---(?:\n|\r\n)?/;
 
-export const GFM_IMAGE_FORMAT = "![]({0})";
-
 export const OUTGOING_LINK_REGEXP = /(?<!!)\[\[(?:[^|\]]*\|)?(?<alias>[^\]]+)\]\]/g;
 
 export enum OUTPUT_FORMATS {
@@ -67,6 +65,22 @@ export const DEFAULT_SETTINGS: MarkdownExportPluginSettings = {
 };
 
 /**
+ * Replaces every occurrence of `search` with `replacement`, both taken
+ * literally. `String.replace` would expand $-patterns in the replacement
+ * ($$, $&, $`, $'), which corrupts content such as `$$` display math.
+ */
+export function replaceAllLiteral(
+    text: string,
+    search: string,
+    replacement: string
+): string {
+    if (!search) {
+        return text;
+    }
+    return text.split(search).join(replacement);
+}
+
+/**
  * Resolves path template variables
  * Supported variables:
  * {{fileName}} - file name (without extension)
@@ -110,7 +124,7 @@ export function resolvePathVariables(
     };
     let result = pathTemplate;
     for (const [key, value] of Object.entries(variables)) {
-        result = result.replace(new RegExp(`{{${key}}}`, "g"), value);
+        result = replaceAllLiteral(result, `{{${key}}}`, value);
     }
     return result;
 }

@@ -8,9 +8,9 @@ import {
     MARKDOWN_ATTACHMENT_URL_REGEXP,
     EMBED_URL_REGEXP,
     EMBED_METADATA_REGEXP,
-    GFM_IMAGE_FORMAT,
     OUTGOING_LINK_REGEXP,
     OUTPUT_FORMATS,
+    replaceAllLiteral,
     resolvePathVariables,
 } from "./config";
 import MarkdownExportPlugin from "./main";
@@ -746,11 +746,16 @@ export function convertMarkdownToText(
     // Replace checkboxes
     // - [ ] becomes ☐
     // - [x] becomes ☑
-    text = text.replace(
-        /- \[ \]/g,
+    text = replaceAllLiteral(
+        text,
+        "- [ ]",
         plugin.settings.textExportCheckboxUnchecked
     );
-    text = text.replace(/- \[x\]/g, plugin.settings.textExportCheckboxChecked);
+    text = replaceAllLiteral(
+        text,
+        "- [x]",
+        plugin.settings.textExportCheckboxChecked
+    );
 
     // Replace bullet points with specific characters
     // - becomes ●
@@ -937,7 +942,8 @@ export async function tryCopyMarkdownByRead(
                             ? ` style='height: ${formatSize(height)};'`
                             : "";
 
-                    content = content.replace(
+                    content = replaceAllLiteral(
+                        content,
                         rawImageLink,
                         `<img src="${hashLink}"${style} />`
                     );
@@ -945,21 +951,28 @@ export async function tryCopyMarkdownByRead(
                     plugin.settings.convertWikiLinksToMarkdown &&
                     rawImageLink.startsWith("![[")
                 ) {
-                    content = content.replace(
+                    content = replaceAllLiteral(
+                        content,
                         rawImageLink,
-                        GFM_IMAGE_FORMAT.format(hashLink)
+                        `![](${hashLink})`
                     );
                 } else if (plugin.settings.GFM) {
-                    content = content.replace(
+                    content = replaceAllLiteral(
+                        content,
                         rawImageLink,
-                        GFM_IMAGE_FORMAT.format(hashLink + imageMetadata)
+                        `![](${hashLink}${imageMetadata})`
                     );
                 } else {
-                    content = content.replace(
+                    content = replaceAllLiteral(
+                        content,
                         rawImageLink,
                         rawImageLink.startsWith("![[")
                             ? `![[${hashLink}${imageMetadata}]]`
-                            : rawImageLink.replace(urlEncodedImageLink, hashLink)
+                            : replaceAllLiteral(
+                                  rawImageLink,
+                                  urlEncodedImageLink,
+                                  hashLink
+                              )
                     );
                 }
             }
@@ -1000,7 +1013,7 @@ export async function tryCopyMarkdownByRead(
                 // Only replace if we found a replacement
                 // This prevents replacing with "undefined"
                 if (replacement !== undefined) {
-                    content = content.replace(fullMatch, replacement);
+                    content = replaceAllLiteral(content, fullMatch, replacement);
                 }
             }
 
