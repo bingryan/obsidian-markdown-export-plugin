@@ -344,6 +344,24 @@ class MarkdownExportSettingTab extends PluginSettingTab {
             );
 
         new Setting(containerEl)
+            .setName("Single Line Breaks")
+            .setDesc(
+                "Obsidian renders a single line break inside a paragraph as a new line, plain Markdown renderers do not. Choose how exported Markdown should keep those breaks. YAML headers, code blocks, math blocks and tables are left untouched."
+            )
+            .addDropdown((dropdown) =>
+                dropdown
+                    .addOption("off", "Keep as is")
+                    .addOption("br", "Append <br>")
+                    .addOption("backslash", "Append trailing backslash")
+                    .setValue(this.plugin.settings.lineBreakMode)
+                    .onChange(async (value: string) => {
+                        this.plugin.settings.lineBreakMode =
+                            value as MarkdownExportPluginSettings["lineBreakMode"];
+                        await this.plugin.saveSettings();
+                    })
+            );
+
+        new Setting(containerEl)
             .setName("Use Html tag <img /> to display image")
             .setDesc(
                 "false default, <img /> tag will use the size specified in obsidian."
