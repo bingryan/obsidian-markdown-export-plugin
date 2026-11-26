@@ -1,3 +1,15 @@
+# 1.0.44 (Thu Nov 26 2026)
+
+#### 🐛 Bug Fix
+
+- feat: convert single line breaks for exported markdown (#127) [#135](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/135) ([@bingryan](https://github.com/bingryan))
+
+#### Authors: 1
+
+- [@bingryan](https://github.com/bingryan)
+
+---
+
 # 1.0.43 (Thu Nov 26 2026)
 
 #### 🐛 Bug Fix
