@@ -1,3 +1,15 @@
+# 1.0.43 (Thu Nov 26 2026)
+
+#### 🐛 Bug Fix
+
+- fix: percent-encode attachment links for markdown and HTML (#131) [#134](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/134) ([@bingryan](https://github.com/bingryan))
+
+#### Authors: 1
+
+- [@bingryan](https://github.com/bingryan)
+
+---
+
 # 1.0.42 (Thu Nov 26 2026)
 
 #### 🐛 Bug Fix
