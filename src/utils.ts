@@ -987,10 +987,14 @@ export async function tryCopyMarkdownByRead(
             // when the active file changes during async processing or is undefined
             const embedMap = await getEmbedMap(plugin, content, file.path);
             const embeds = await getEmbeds(content);
-            for (const index in embeds) {
-                const embedMatch = embeds[index];
+            // Build the output from the original content: an embed replacement
+            // may contain its own `![[...]]` text, which must not be scanned again.
+            let contentWithEmbeds = "";
+            let copiedUpTo = 0;
+            for (const embedMatch of embeds) {
                 const fullMatch = embedMatch[0];
                 const embedLink = embedMatch[1];
+                const matchStart = embedMatch.index ?? copiedUpTo;
 
                 let replacement = embedMap.get(embedLink);
 
@@ -1013,9 +1017,12 @@ export async function tryCopyMarkdownByRead(
                 // Only replace if we found a replacement
                 // This prevents replacing with "undefined"
                 if (replacement !== undefined) {
-                    content = replaceAllLiteral(content, fullMatch, replacement);
+                    contentWithEmbeds +=
+                        content.slice(copiedUpTo, matchStart) + replacement;
+                    copiedUpTo = matchStart + fullMatch.length;
                 }
             }
+            content = contentWithEmbeds + content.slice(copiedUpTo);
 
             if (plugin.settings.convertWikiLinksToMarkdown) {
                 content = content.replace(
