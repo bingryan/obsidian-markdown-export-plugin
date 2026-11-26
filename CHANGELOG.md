@@ -1,3 +1,15 @@
+# 1.0.42 (Thu Nov 26 2026)
+
+#### 🐛 Bug Fix
+
+- fix: keep $-patterns in replaced text literal (#132) [#133](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/133) ([@bingryan](https://github.com/bingryan))
+
+#### Authors: 1
+
+- [@bingryan](https://github.com/bingryan)
+
+---
+
 # 1.0.41 (Sun Aug 30 2026)
 
 #### 🐛 Bug Fix
