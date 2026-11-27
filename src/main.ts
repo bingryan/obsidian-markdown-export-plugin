@@ -470,6 +470,43 @@ class MarkdownExportSettingTab extends PluginSettingTab {
                         await this.plugin.saveSettings();
                     })
             );
+        let deleteWarningEl: HTMLElement | null = null;
+        new Setting(containerEl)
+            .setName("Delete Note After Export")
+            .setDesc(
+                "Move instead of copy: after a successful export the note is removed from the vault. Deleted notes go through Obsidian's trash handling (or the system/local trash), so they stay recoverable."
+            )
+            .addToggle((toggle) =>
+                toggle
+                    .setValue(this.plugin.settings.deleteAfterExport)
+                    .onChange(async (value: boolean) => {
+                        this.plugin.settings.deleteAfterExport = value;
+                        await this.plugin.saveSettings();
+
+                        if (deleteWarningEl) {
+                            deleteWarningEl.style.display = value ? "" : "none";
+                        }
+
+                        if (value) {
+                            const fragment = document.createDocumentFragment();
+                            const warning = document.createElement("span");
+                            warning.className = "markdown-export-warning";
+                            warning.textContent =
+                                "⚠️ Danger: exported notes are deleted from your vault (moved to trash). Check the Output Path before exporting.";
+                            fragment.appendChild(warning);
+                            new Notice(fragment, 10000);
+                        }
+                    })
+            );
+
+        deleteWarningEl = containerEl.createEl("p", {
+            cls: "markdown-export-warning",
+            text: "⚠️ Danger: this deletes notes from your vault once they are exported. They go to the trash, but an incorrect Output Path can leave you without the originals.",
+        });
+        deleteWarningEl.style.display = this.plugin.settings.deleteAfterExport
+            ? ""
+            : "none";
+
         new Setting(containerEl)
             .setName("Remove YAML Metadata Header")
             .setDesc(

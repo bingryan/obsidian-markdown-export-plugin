@@ -6,3 +6,10 @@ available in the app when your plugin is enabled.
 If your plugin does not need CSS, delete this file.
 
 */
+
+/* Amber warning for destructive settings (see "Delete Note After Export") */
+.markdown-export-warning {
+    color: var(--text-warning);
+    font-size: var(--font-ui-small);
+    font-weight: var(--font-medium);
+}
