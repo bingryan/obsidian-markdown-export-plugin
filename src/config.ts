@@ -8,7 +8,14 @@ export const EMBED_URL_REGEXP = /!\[\[([\s\S]*?)\]\]/g;
 export const EMBED_METADATA_REGEXP =
     /^---(?:\n|\r\n)[\s\S]*?(?:\n|\r\n)---(?:\n|\r\n)?/;
 
-export const OUTGOING_LINK_REGEXP = /(?<!!)\[\[(?:[^|\]]*\|)?(?<alias>[^\]]+)\]\]/g;
+// `[[target]]` and `[[target|alias]]`: keep the alias when present, otherwise
+// the target. The target is nonempty and cannot contain `|`, so `[[]]` (e.g.
+// `const rows = [[]];`) stays intact and only the first pipe can start an
+// alias. Backslashes are allowed inside the target (MathJax in headings), and
+// the escaped `\|` separator used in tables is consumed as a separator, so
+// `[[note\|]]` still exports `note`. Embeds (`![[...]]`) are excluded.
+export const OUTGOING_LINK_REGEXP =
+    /(?<!!)\[\[(?<target>[^\]|]+?)(?:\\?\|(?<alias>[^\]]*))?\]\]/g;
 
 export enum OUTPUT_FORMATS {
     MD = "Markdown",
