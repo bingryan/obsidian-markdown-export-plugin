@@ -436,22 +436,74 @@ export async function tryCreateFolder(plugin: MarkdownExportPlugin, p: string) {
  * @param plugin
  * @param p path to create
  * @param data
+ * @returns true when the file was written, false when it already existed
  */
 export async function tryCreate(
     plugin: MarkdownExportPlugin,
     p: string,
     data: string
-) {
+): Promise<boolean> {
     try {
         if (p.startsWith("/") || path.win32.isAbsolute(p)) {
             fs.writeFileSync(p, data);
         } else {
             await plugin.app.vault.create(p, data);
         }
+        return true;
     } catch (error) {
         if (!error.message.contains("file already exists")) {
             throw error;
         }
+        return false;
+    }
+}
+
+/**
+ * Whether the export target resolves to the source note itself. An absolute
+ * Output Path inside the vault would slip past a plain string comparison.
+ */
+function isSamePathAsExportTarget(
+    plugin: MarkdownExportPlugin,
+    file: TFile,
+    exportedPath: string
+): boolean {
+    if (exportedPath.replace(/\\/g, "/") === file.path) {
+        return true;
+    }
+
+    const adapter = plugin.app.vault.adapter as unknown as {
+        getBasePath?: () => string;
+    };
+    const basePath = adapter.getBasePath?.();
+    const sourcePath = basePath
+        ? path.join(basePath, file.path)
+        : getResourceOsPath(plugin, file);
+    const targetPath =
+        path.isAbsolute(exportedPath) || path.win32.isAbsolute(exportedPath)
+            ? exportedPath
+            : basePath
+            ? path.join(basePath, exportedPath)
+            : null;
+
+    return (
+        targetPath !== null &&
+        path.resolve(targetPath) === path.resolve(sourcePath)
+    );
+}
+
+/**
+ * The export is written from a snapshot of the note. If the note was edited
+ * while the export ran, the exported file is stale and the note must stay.
+ */
+async function isSourceUnchanged(
+    plugin: MarkdownExportPlugin,
+    file: TFile,
+    snapshot: string
+): Promise<boolean> {
+    try {
+        return (await plugin.app.vault.adapter.read(file.path)) === snapshot;
+    } catch {
+        return false;
     }
 }
 
@@ -1017,6 +1069,8 @@ export async function tryCopyMarkdownByRead(
 ) {
     try {
         await plugin.app.vault.adapter.read(file.path).then(async (content) => {
+            // Snapshot used to verify the note did not change before trashing it
+            const originalContent = content;
             const imageLinks = await getImageLinks(content);
             
             const vaultName = plugin.app.vault.getName();
@@ -1260,6 +1314,7 @@ export async function tryCopyMarkdownByRead(
             await tryCreateFolder(plugin, outDir);
 
             let exportedPath = "";
+            let exportedWritten = false;
             switch (outputFormat) {
                 case OUTPUT_FORMATS.HTML: {
                     let filename;
@@ -1278,7 +1333,7 @@ export async function tryCopyMarkdownByRead(
                         content
                     );
                     exportedPath = targetFile;
-                    await tryCreate(plugin, targetFile, html);
+                    exportedWritten = await tryCreate(plugin, targetFile, html);
                     break;
                 }
                 case OUTPUT_FORMATS.MD: {
@@ -1297,7 +1352,11 @@ export async function tryCopyMarkdownByRead(
                                   plugin.settings.lineBreakMode
                               );
                     exportedPath = targetFile;
-                    await tryCreate(plugin, targetFile, markdownContent);
+                    exportedWritten = await tryCreate(
+                        plugin,
+                        targetFile,
+                        markdownContent
+                    );
                     break;
                 }
                 case OUTPUT_FORMATS.TEXT: {
@@ -1313,18 +1372,33 @@ export async function tryCopyMarkdownByRead(
                     );
                     const textContent = convertMarkdownToText(plugin, content);
                     exportedPath = targetFile;
-                    await tryCreate(plugin, targetFile, textContent);
+                    exportedWritten = await tryCreate(
+                        plugin,
+                        targetFile,
+                        textContent
+                    );
                     break;
                 }
             }
 
             if (
                 plugin.settings.deleteAfterExport &&
+                exportedWritten &&
                 file instanceof TFile &&
                 file.extension === "md" &&
-                exportedPath.replace(/\\/g, "/") !== file.path
+                !isSamePathAsExportTarget(plugin, file, exportedPath)
             ) {
-                await trashExportedNote(plugin, file);
+                if (await isSourceUnchanged(plugin, file, originalContent)) {
+                    await trashExportedNote(plugin, file);
+                } else {
+                    console.warn(
+                        `Markdown Export: ${file.path} changed during export, so the note was not trashed.`
+                    );
+                    new Notice(
+                        `Markdown Export: ${file.name} changed during export, so it was kept in the vault.`,
+                        8000
+                    );
+                }
             }
         });
     } catch (error) {
