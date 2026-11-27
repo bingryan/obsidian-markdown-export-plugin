@@ -1,3 +1,15 @@
+# 1.0.45 (Fri Nov 27 2026)
+
+#### 🐛 Bug Fix
+
+- fix: resolve embeds vault-wide and report un-inlined ones (#126) [#136](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/136) ([@bingryan](https://github.com/bingryan))
+
+#### Authors: 1
+
+- [@bingryan](https://github.com/bingryan)
+
+---
+
 # 1.0.44 (Thu Nov 26 2026)
 
 #### 🐛 Bug Fix
