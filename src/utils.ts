@@ -462,6 +462,38 @@ export async function tryCreate(
 }
 
 /**
+ * Title shown when "Include File Name as Heading" is on: the front matter
+ * `title` when it is a plain string, otherwise the file name without extension.
+ */
+function getExportTitle(plugin: MarkdownExportPlugin, file: TFile): string {
+    const frontmatter = plugin.app.metadataCache.getFileCache(file)?.frontmatter;
+    const title = frontmatter?.title;
+    if (typeof title === "string" && title.trim() !== "") {
+        return title.trim();
+    }
+    return file.name.replace(/\.[^/.]+$/, "");
+}
+
+/**
+ * Prepend `# <title>` to the exported content. The heading goes after the YAML
+ * front matter (prepending it would break the block) and is skipped when the
+ * note already starts with that exact heading.
+ */
+function prependTitleHeading(content: string, title: string): string {
+    const frontMatter = content.match(EMBED_METADATA_REGEXP);
+    const header = frontMatter ? frontMatter[0] : "";
+    const body = content.slice(header.length);
+    const heading = `# ${title}`;
+    const firstLine = body.split("\n").find((line) => line.trim() !== "");
+
+    if (firstLine !== undefined && firstLine.trim() === heading) {
+        return content;
+    }
+
+    return `${header}${heading}\n\n${body.replace(/^(\r?\n)+/, "")}`;
+}
+
+/**
  * Whether the export target resolves to the source note itself. An absolute
  * Output Path inside the vault would slip past a plain string comparison.
  */
@@ -1323,6 +1355,11 @@ export async function tryCopyMarkdownByRead(
 
             await tryCreateFolder(plugin, outDir);
 
+            const titledContent =
+                plugin.settings.includeTitleHeading && file instanceof TFile
+                    ? prependTitleHeading(content, getExportTitle(plugin, file))
+                    : content;
+
             let exportedPath = "";
             let exportedWritten = false;
             switch (outputFormat) {
@@ -1340,7 +1377,7 @@ export async function tryCopyMarkdownByRead(
                     const { html } = await markdownToHTML(
                         plugin,
                         file.path,
-                        content
+                        titledContent
                     );
                     exportedPath = targetFile;
                     exportedWritten = await tryCreate(
@@ -1361,9 +1398,9 @@ export async function tryCopyMarkdownByRead(
                     const targetFile = path.join(outDir, filename);
                     const markdownContent =
                         plugin.settings.lineBreakMode === "off"
-                            ? content
+                            ? titledContent
                             : convertSoftLineBreaks(
-                                  content,
+                                  titledContent,
                                   plugin.settings.lineBreakMode
                               );
                     exportedPath = targetFile;

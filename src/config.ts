@@ -40,6 +40,8 @@ export interface MarkdownExportPluginSettings {
     removeYamlHeader: boolean;
     // Single line breaks are rendered by Obsidian but not by plain Markdown
     lineBreakMode: LineBreakMode;
+    // Prepend `# <title>` to Markdown/HTML output
+    includeTitleHeading: boolean;
     // Move instead of copy: remove the source note after a successful export
     deleteAfterExport: boolean;
     // Block embed settings
@@ -64,6 +66,7 @@ export const DEFAULT_SETTINGS: MarkdownExportPluginSettings = {
     convertWikiLinksToMarkdown: false,
     removeYamlHeader: false,
     lineBreakMode: "off",
+    includeTitleHeading: false,
     deleteAfterExport: false,
     // Block embed settings
     inlineBlockEmbeds: false,
