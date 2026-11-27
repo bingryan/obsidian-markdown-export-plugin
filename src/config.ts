@@ -8,7 +8,10 @@ export const EMBED_URL_REGEXP = /!\[\[([\s\S]*?)\]\]/g;
 export const EMBED_METADATA_REGEXP =
     /^---(?:\n|\r\n)[\s\S]*?(?:\n|\r\n)---(?:\n|\r\n)?/;
 
-export const OUTGOING_LINK_REGEXP = /(?<!!)\[\[(?:[^|\]]*\|)?(?<alias>[^\]]+)\]\]/g;
+// `[[target]]` and `[[target|alias]]`: keep the alias when present, otherwise
+// the target. Embeds (`![[...]]`) are deliberately excluded.
+export const OUTGOING_LINK_REGEXP =
+    /(?<!!)\[\[(?<target>[^\]]*?)(?:\|(?<alias>[^\]]*))?\]\]/g;
 
 export enum OUTPUT_FORMATS {
     MD = "Markdown",

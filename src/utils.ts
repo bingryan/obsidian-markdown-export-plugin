@@ -1134,7 +1134,13 @@ export async function tryCopyMarkdownByRead(
             }
 
             if (plugin.settings.removeOutgoingLinkBrackets) {
-                content = content.replaceAll(OUTGOING_LINK_REGEXP, "$1");
+                // Wiki links only: Markdown links keep their target, since the
+                // setting is about removing `[[...]]` brackets.
+                content = content.replaceAll(
+                    OUTGOING_LINK_REGEXP,
+                    (match: string, target: string, alias: string) =>
+                        alias || target
+                );
             }
 
             // Process embeds BEFORE converting WikiLinks to Markdown
