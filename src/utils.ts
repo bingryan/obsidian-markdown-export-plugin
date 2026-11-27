@@ -441,11 +441,14 @@ export async function tryCreateFolder(plugin: MarkdownExportPlugin, p: string) {
 export async function tryCreate(
     plugin: MarkdownExportPlugin,
     p: string,
-    data: string
+    data: string,
+    overwrite = true
 ): Promise<boolean> {
     try {
         if (p.startsWith("/") || path.win32.isAbsolute(p)) {
-            fs.writeFileSync(p, data);
+            // In move mode never clobber an existing export: a collision keeps
+            // the source note instead of overwriting another note's result.
+            fs.writeFileSync(p, data, { flag: overwrite ? "w" : "wx" });
         } else {
             await plugin.app.vault.create(p, data);
         }
@@ -1383,12 +1386,19 @@ export async function tryCopyMarkdownByRead(
 
             if (
                 plugin.settings.deleteAfterExport &&
-                exportedWritten &&
                 file instanceof TFile &&
                 file.extension === "md" &&
                 !isSamePathAsExportTarget(plugin, file, exportedPath)
             ) {
-                if (await isSourceUnchanged(plugin, file, originalContent)) {
+                if (!exportedWritten) {
+                    console.warn(
+                        `Markdown Export: ${exportedPath} already exists, so ${file.path} was kept in the vault.`
+                    );
+                    new Notice(
+                        `Markdown Export: an export already exists at ${exportedPath}, so ${file.name} was kept in the vault.`,
+                        8000
+                    );
+                } else if (await isSourceUnchanged(plugin, file, originalContent)) {
                     await trashExportedNote(plugin, file);
                 } else {
                     console.warn(
