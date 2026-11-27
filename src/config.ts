@@ -9,12 +9,13 @@ export const EMBED_METADATA_REGEXP =
     /^---(?:\n|\r\n)[\s\S]*?(?:\n|\r\n)---(?:\n|\r\n)?/;
 
 // `[[target]]` and `[[target|alias]]`: keep the alias when present, otherwise
-// the target. The target is nonempty and cannot contain `|` or `\`, so `[[]]`
-// and code samples stay intact and the `\|` separator used inside tables is
-// consumed as a separator, not as part of the target. Embeds (`![[...]]`) are
-// deliberately excluded.
+// the target. The target is nonempty and cannot contain `|`, so `[[]]` (e.g.
+// `const rows = [[]];`) stays intact and only the first pipe can start an
+// alias. Backslashes are allowed inside the target (MathJax in headings), and
+// the escaped `\|` separator used in tables is consumed as a separator, so
+// `[[note\|]]` still exports `note`. Embeds (`![[...]]`) are excluded.
 export const OUTGOING_LINK_REGEXP =
-    /(?<!!)\[\[(?<target>[^\]|\\]+?)(?:\\?\|(?<alias>[^\]]*))?\]\]/g;
+    /(?<!!)\[\[(?<target>[^\]|]+?)(?:\\?\|(?<alias>[^\]]*))?\]\]/g;
 
 export enum OUTPUT_FORMATS {
     MD = "Markdown",
