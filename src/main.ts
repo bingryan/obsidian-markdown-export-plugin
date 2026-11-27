@@ -471,6 +471,20 @@ class MarkdownExportSettingTab extends PluginSettingTab {
                     })
             );
         new Setting(containerEl)
+            .setName("Delete Note After Export")
+            .setDesc(
+                "Move instead of copy: after a successful export the note is removed from the vault. Deleted notes go through Obsidian's trash handling (or the system/local trash), so they stay recoverable."
+            )
+            .addToggle((toggle) =>
+                toggle
+                    .setValue(this.plugin.settings.deleteAfterExport)
+                    .onChange(async (value: boolean) => {
+                        this.plugin.settings.deleteAfterExport = value;
+                        await this.plugin.saveSettings();
+                    })
+            );
+
+        new Setting(containerEl)
             .setName("Remove YAML Metadata Header")
             .setDesc(
                 "If enabled, the YAML metadata header will be removed from embedded files when exporting."

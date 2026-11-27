@@ -455,6 +455,25 @@ export async function tryCreate(
     }
 }
 
+/**
+ * Move an exported note to the trash. Prefers Obsidian's own trash handling
+ * (which follows the user's "Deleted files" setting) and falls back to the
+ * vault trash API, so the note stays recoverable.
+ */
+async function trashExportedNote(
+    plugin: MarkdownExportPlugin,
+    file: TFile
+): Promise<void> {
+    const fileManager = plugin.app.fileManager as unknown as {
+        trashFile?: (file: TAbstractFile) => Promise<void>;
+    };
+    if (typeof fileManager?.trashFile === "function") {
+        await fileManager.trashFile(file);
+        return;
+    }
+    await plugin.app.vault.trash(file, true);
+}
+
 export async function tryCopyImage(
     plugin: MarkdownExportPlugin,
     filename: string,
@@ -1240,6 +1259,7 @@ export async function tryCopyMarkdownByRead(
 
             await tryCreateFolder(plugin, outDir);
 
+            let exportedPath = "";
             switch (outputFormat) {
                 case OUTPUT_FORMATS.HTML: {
                     let filename;
@@ -1257,6 +1277,7 @@ export async function tryCopyMarkdownByRead(
                         file.path,
                         content
                     );
+                    exportedPath = targetFile;
                     await tryCreate(plugin, targetFile, html);
                     break;
                 }
@@ -1275,6 +1296,7 @@ export async function tryCopyMarkdownByRead(
                                   content,
                                   plugin.settings.lineBreakMode
                               );
+                    exportedPath = targetFile;
                     await tryCreate(plugin, targetFile, markdownContent);
                     break;
                 }
@@ -1290,9 +1312,19 @@ export async function tryCopyMarkdownByRead(
                         filename.replace(".md", ".txt")
                     );
                     const textContent = convertMarkdownToText(plugin, content);
+                    exportedPath = targetFile;
                     await tryCreate(plugin, targetFile, textContent);
                     break;
                 }
+            }
+
+            if (
+                plugin.settings.deleteAfterExport &&
+                file instanceof TFile &&
+                file.extension === "md" &&
+                exportedPath.replace(/\\/g, "/") !== file.path
+            ) {
+                await trashExportedNote(plugin, file);
             }
         });
     } catch (error) {
