@@ -1336,7 +1336,12 @@ export async function tryCopyMarkdownByRead(
                         content
                     );
                     exportedPath = targetFile;
-                    exportedWritten = await tryCreate(plugin, targetFile, html);
+                    exportedWritten = await tryCreate(
+                        plugin,
+                        targetFile,
+                        html,
+                        !plugin.settings.deleteAfterExport
+                    );
                     break;
                 }
                 case OUTPUT_FORMATS.MD: {
@@ -1358,7 +1363,8 @@ export async function tryCopyMarkdownByRead(
                     exportedWritten = await tryCreate(
                         plugin,
                         targetFile,
-                        markdownContent
+                        markdownContent,
+                        !plugin.settings.deleteAfterExport
                     );
                     break;
                 }
@@ -1378,7 +1384,8 @@ export async function tryCopyMarkdownByRead(
                     exportedWritten = await tryCreate(
                         plugin,
                         targetFile,
-                        textContent
+                        textContent,
+                        !plugin.settings.deleteAfterExport
                     );
                     break;
                 }
