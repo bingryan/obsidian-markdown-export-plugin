@@ -1,3 +1,15 @@
+# 1.0.47 (Fri Nov 27 2026)
+
+#### 🐛 Bug Fix
+
+- feat: option to trash the note after a successful export (#100) [#138](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/138) ([@bingryan](https://github.com/bingryan))
+
+#### Authors: 1
+
+- [@bingryan](https://github.com/bingryan)
+
+---
+
 # 1.0.46 (Fri Nov 27 2026)
 
 #### 🐛 Bug Fix
