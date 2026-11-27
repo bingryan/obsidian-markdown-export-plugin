@@ -1,3 +1,15 @@
+# 1.0.46 (Fri Nov 27 2026)
+
+#### 🐛 Bug Fix
+
+- fix: strip outgoing link brackets to alias, fall back to target (#124) [#137](https://github.com/bingryan/obsidian-markdown-export-plugin/pull/137) ([@bingryan](https://github.com/bingryan))
+
+#### Authors: 1
+
+- [@bingryan](https://github.com/bingryan)
+
+---
+
 # 1.0.45 (Fri Nov 27 2026)
 
 #### 🐛 Bug Fix
