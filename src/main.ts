@@ -508,6 +508,20 @@ class MarkdownExportSettingTab extends PluginSettingTab {
             : "none";
 
         new Setting(containerEl)
+            .setName("Include Note Title as Heading")
+            .setDesc(
+                "Prepend `# Title` to Markdown and HTML exports. The title is the front matter `title` when it is a string, otherwise the file name without extension. This adds a heading (and an anchor) to the exported file, so it is off by default."
+            )
+            .addToggle((toggle) =>
+                toggle
+                    .setValue(this.plugin.settings.includeTitleHeading)
+                    .onChange(async (value: boolean) => {
+                        this.plugin.settings.includeTitleHeading = value;
+                        await this.plugin.saveSettings();
+                    })
+            );
+
+        new Setting(containerEl)
             .setName("Remove YAML Metadata Header")
             .setDesc(
                 "If enabled, the YAML metadata header will be removed from embedded files when exporting."

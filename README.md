@@ -16,6 +16,7 @@ It allows you to export markdown to a package (including pictures) with one clic
 - [x]  Embed content
 - [x]  Option to convert single line breaks to `<br>` or a trailing backslash
 - [x]  Option to remove the note after export (goes to trash, move instead of copy)
+- [x]  Option to prepend `# Title` to exported Markdown/HTML
 - [x]  support output format: `html`, `md`
 
 > \[!IMPORTANT]
