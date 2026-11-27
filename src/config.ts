@@ -9,9 +9,12 @@ export const EMBED_METADATA_REGEXP =
     /^---(?:\n|\r\n)[\s\S]*?(?:\n|\r\n)---(?:\n|\r\n)?/;
 
 // `[[target]]` and `[[target|alias]]`: keep the alias when present, otherwise
-// the target. Embeds (`![[...]]`) are deliberately excluded.
+// the target. The target is nonempty and cannot contain `|` or `\`, so `[[]]`
+// and code samples stay intact and the `\|` separator used inside tables is
+// consumed as a separator, not as part of the target. Embeds (`![[...]]`) are
+// deliberately excluded.
 export const OUTGOING_LINK_REGEXP =
-    /(?<!!)\[\[(?<target>[^\]]*?)(?:\|(?<alias>[^\]]*))?\]\]/g;
+    /(?<!!)\[\[(?<target>[^\]|\\]+?)(?:\\?\|(?<alias>[^\]]*))?\]\]/g;
 
 export enum OUTPUT_FORMATS {
     MD = "Markdown",
