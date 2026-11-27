@@ -533,7 +533,8 @@ export async function tryCopyImage(
     plugin: MarkdownExportPlugin,
     filename: string,
     contentPath: string
-) {
+): Promise<boolean> {
+    let allCopied = true;
     try {
         await plugin.app.vault.adapter
             .read(contentPath)
@@ -628,6 +629,7 @@ export async function tryCopyImage(
                             }
                         }
                     } catch (error) {
+                        allCopied = false;
                         console.error(
                             `Failed to copy file from ${filePath} to ${targetPath}: ${error.message}`
                         );
@@ -639,6 +641,7 @@ export async function tryCopyImage(
             throw error;
         }
     }
+    return allCopied;
 }
 
 export async function tryCopyMarkdown(
@@ -1300,7 +1303,11 @@ export async function tryCopyMarkdownByRead(
                 );
             }
 
-            await tryCopyImage(plugin, file.name, file.path);
+            const imagesCopied = await tryCopyImage(
+                plugin,
+                file.name,
+                file.path
+            );
 
             // If the user has a custom filename set, we enforce subdirectories to
             // prevent rendered files from overwriting each other
@@ -1403,6 +1410,14 @@ export async function tryCopyMarkdownByRead(
                     );
                     new Notice(
                         `Markdown Export: an export already exists at ${exportedPath}, so ${file.name} was kept in the vault.`,
+                        8000
+                    );
+                } else if (!imagesCopied) {
+                    console.warn(
+                        `Markdown Export: an attachment could not be copied for ${file.path}, so the note was kept in the vault.`
+                    );
+                    new Notice(
+                        `Markdown Export: an attachment of ${file.name} could not be copied, so the note was kept in the vault.`,
                         8000
                     );
                 } else if (await isSourceUnchanged(plugin, file, originalContent)) {
